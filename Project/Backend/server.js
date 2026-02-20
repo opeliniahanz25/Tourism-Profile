@@ -4,9 +4,10 @@ import pool from './db.js';
 
 const app = express();
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
+// 1. SIGN UP ROUTE
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -21,6 +22,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+// 2. LOGIN ROUTE
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -28,6 +30,7 @@ app.post('/login', async (req, res) => {
             "SELECT * FROM users WHERE email = $1 AND password = $2", 
             [email, password]
         );
+        
         if (user.rows.length > 0) {
             res.status(200).json({ 
                 message: "Login successful!", 
@@ -42,7 +45,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port ${PORT}`);
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
