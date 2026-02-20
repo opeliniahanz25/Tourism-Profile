@@ -10,8 +10,8 @@ import TourismAssets from './TourismAssets';
 import Transportation from './Transportation';
 import InstitutionalElements from './InstitutionalElements';
 
-// Assets
-import backgroundImage from '../../assets/background.jpg';
+// Assets - FIXED PATH
+import backgroundImage from '/Background.jpg';
 import { initialProfileData, type ProfileData } from '../../data/profileData';
 
 export default function AdminDashboard() {
