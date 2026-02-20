@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Info, Users, MapPin, Building2, Bus, School, ShieldAlert } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import backgroundImage from '/Background.jpg';
+import backgroundImage from "../../../public/assets/Background.jpg";
 import { initialProfileData, type ProfileData } from '../../data/profileData';
 
 // --- TAB IMPORTS ---

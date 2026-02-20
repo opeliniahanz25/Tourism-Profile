@@ -1,7 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock } from "lucide-react";
-import shesh from '../../assets/shesh.png'; 
+import shesh from '../../../public/assets/shesh.png'; 
 
 export default function DashboardHeader() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import bgImage from "../assets/background.jpg"; 
-import shesh from "../assets/shesh.png";
+import bgImage from "../../public/assets/Background.jpg";
+import shesh from "../../public/assets/shesh.png";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 import { FaFingerprint, FaEye, FaRegEyeSlash, FaFacebook, FaTwitter, FaGoogle } from "react-icons/fa";
 

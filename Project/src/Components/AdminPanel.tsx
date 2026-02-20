@@ -7,7 +7,7 @@ import {
   Plus, Upload
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import backgroundImage from '../assets/background.jpg';
+import backgroundImage from "../../public/assets/Background.jpg";
 
 // Assets & Data structure
 import shesh from '../assets/shesh.png'; 

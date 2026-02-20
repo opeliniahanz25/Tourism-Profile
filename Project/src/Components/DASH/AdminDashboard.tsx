@@ -11,7 +11,7 @@ import Transportation from './Transportation';
 import InstitutionalElements from './InstitutionalElements';
 
 // Assets - FIXED PATH
-import backgroundImage from '/Background.jpg';
+import backgroundImage from '../../../public/assets/Background.jpg';
 import { initialProfileData, type ProfileData } from '../../data/profileData';
 
 export default function AdminDashboard() {

@@ -1,5 +1,5 @@
 
-import shesh from '../../assets/shesh.png'; 
+import shesh from '../../../public/assets/shesh.png'; 
 
 export default function TitleCard() {
   return (

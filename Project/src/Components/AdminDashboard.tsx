@@ -4,7 +4,7 @@ import {
   ArrowLeft, LayoutDashboard, Users, ShieldAlert, AlertTriangle, Lock
 } from "lucide-react";
 import { Toaster } from "sonner";
-import backgroundImage from '../assets/background.jpg';
+import backgroundImage from "../../public/assets/Background.jpg";
 
 // Assets
 import shesh from '../assets/shesh.png'; 
