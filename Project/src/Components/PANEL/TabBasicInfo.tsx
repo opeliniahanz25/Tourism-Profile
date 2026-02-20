@@ -71,7 +71,7 @@ export default function TabBasicInfo({ editData, setEditData }: TabBasicInfoProp
           <div className="space-y-2">
             <label className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Religions</label>
             <textarea 
-              className="w-full bg-[#f3f4f6] border-none rounded-lg px-4 py-2 font-bold text-gray-700 outline-none uppercase focus:ring-2 focus:ring-blue-500/20 min-h-[80px] resize-none" 
+              className="w-full bg-[#f3f4f6] border-none rounded-lg px-4 py-2 font-bold text-gray-700 outline-none uppercase focus:ring-2 focus:ring-blue-500/20 min-h-20 resize-none" 
               placeholder="E.G. ROMAN CATHOLIC, PROTESTANTISM"
               value={(editData.basicInfo as any).religion || ""}
               onChange={(e) => updateBasic('religion' as any, e.target.value.toUpperCase())}
@@ -82,7 +82,7 @@ export default function TabBasicInfo({ editData, setEditData }: TabBasicInfoProp
           <div className="space-y-2">
             <label className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Major Economic Activities</label>
             <textarea 
-              className="w-full bg-[#f3f4f6] border-none rounded-lg px-4 py-2 font-bold text-gray-700 outline-none uppercase focus:ring-2 focus:ring-blue-500/20 min-h-[80px] resize-none" 
+              className="w-full bg-[#f3f4f6] border-none rounded-lg px-4 py-2 font-bold text-gray-700 outline-none uppercase focus:ring-2 focus:ring-blue-500/20 min-h-20 resize-none" 
               placeholder="E.G. TOURISM, FISHING, FARMING"
               value={(editData.basicInfo as any).economicActivities || ""}
               onChange={(e) => updateBasic('economicActivities' as any, e.target.value.toUpperCase())}
