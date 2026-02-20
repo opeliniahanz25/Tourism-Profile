@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import { ShieldAlert, AlertTriangle, Phone, Users, GraduationCap, Briefcase, Building2 } from "lucide-react";
 
 export default function InstitutionalElements({ data }: { data: any }) {

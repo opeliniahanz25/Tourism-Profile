@@ -1,7 +1,13 @@
-import * as React from "react";
-import { Upload } from "lucide-react";
+
 
 export default function TabSafety({ editData, setEditData }: { editData: any, setEditData: any }) {
+  const handleInputChange = (field: string, value: string) => {
+    setEditData({
+      ...editData,
+      [field]: value
+    });
+  };
+
   return (
     <div className="space-y-12 animate-in fade-in duration-300 uppercase font-black">
       <section className="space-y-6">
@@ -10,7 +16,12 @@ export default function TabSafety({ editData, setEditData }: { editData: any, se
           {["KIDNAPPING", "DROWNING", "PETTY THEFT", "ROAD ACCIDENTS", "HARASSMENT", "DRUGS"].map((crime) => (
             <div key={crime} className="flex justify-between items-center gap-10 p-2 border-b border-gray-50 font-black">
               <span className="text-[11px] font-black text-gray-600 w-1/3 uppercase">{crime}</span>
-              <input className="flex-1 bg-[#f3f4f6] rounded-lg px-4 py-2 text-[10px] font-black outline-none" placeholder="DESCRIPTION" />
+              <input 
+                className="flex-1 bg-[#f3f4f6] rounded-lg px-4 py-2 text-[10px] font-black outline-none" 
+                placeholder="DESCRIPTION"
+                value={editData?.[crime] || ''}
+                onChange={(e) => handleInputChange(crime, e.target.value)}
+              />
             </div>
           ))}
         </div>
@@ -21,8 +32,18 @@ export default function TabSafety({ editData, setEditData }: { editData: any, se
         {['EARTHQUAKE', 'LANDSLIDE', 'STORM SURGE', 'TSUNAMI'].map((hazard) => (
           <div key={hazard} className="p-4 bg-[#f9fafb] rounded-xl mb-4 grid grid-cols-3 gap-4">
             <div className="col-span-1 font-black text-blue-600 text-xs self-center">{hazard}</div>
-            <input className="bg-white rounded px-3 py-2 text-[10px]" placeholder="LOCATION" />
-            <input className="bg-white rounded px-3 py-2 text-[10px]" placeholder="POPULATION AFFECTED" />
+            <input 
+              className="bg-white rounded px-3 py-2 text-[10px]" 
+              placeholder="LOCATION"
+              value={editData?.[`${hazard}_location`] || ''}
+              onChange={(e) => handleInputChange(`${hazard}_location`, e.target.value)}
+            />
+            <input 
+              className="bg-white rounded px-3 py-2 text-[10px]" 
+              placeholder="POPULATION AFFECTED"
+              value={editData?.[`${hazard}_population`] || ''}
+              onChange={(e) => handleInputChange(`${hazard}_population`, e.target.value)}
+            />
           </div>
         ))}
       </section>

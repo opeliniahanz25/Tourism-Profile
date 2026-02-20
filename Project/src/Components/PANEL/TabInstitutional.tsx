@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import { Plus, Trash2, ShieldAlert, AlertTriangle, GraduationCap, Briefcase, Phone, Users, Building2 } from "lucide-react";
 
 export default function TabInstitutional({ editData, setEditData }: { editData: any, setEditData: any }) {

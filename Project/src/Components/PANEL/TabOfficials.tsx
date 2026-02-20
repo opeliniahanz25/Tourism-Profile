@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import { type ProfileData } from '../../data/profileData';
 
 export default function TabOfficials({ editData, setEditData }: { editData: ProfileData, setEditData: any }) {

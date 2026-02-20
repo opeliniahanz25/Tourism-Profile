@@ -1,10 +1,7 @@
-import * as React from "react";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, LayoutDashboard, Building2, MapPin, 
-  BedDouble, Users, HardHat, Banknote, Phone, 
-  GraduationCap, FolderKanban, ShieldAlert, AlertTriangle, Lock
+  ArrowLeft, LayoutDashboard, Users, ShieldAlert, AlertTriangle, Lock
 } from "lucide-react";
 import { Toaster } from "sonner";
 import backgroundImage from '../assets/background.jpg';
@@ -13,13 +10,35 @@ import backgroundImage from '../assets/background.jpg';
 import shesh from '../assets/shesh.png'; 
 import { initialProfileData, type ProfileData } from '../data/profileData';
 
-export default function AdminDashboard() {
+// Define and export the props interface
+export interface AdminDashboardProps {
+  data: any; // Make it required since you're passing it from App.tsx
+}
+
+export default function AdminDashboard({ data }: AdminDashboardProps) {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
 
   useEffect(() => {
-    const savedData = localStorage.getItem('profileData');
-    if (savedData) setProfileData(JSON.parse(savedData));
+    // If data is provided via props, use it
+    if (data) {
+      setProfileData(data);
+    } else {
+      // Otherwise fallback to localStorage
+      const savedData = localStorage.getItem('profileData');
+      if (savedData) setProfileData(JSON.parse(savedData));
+    }
+  }, [data]);
+
+  // Also listen for storage events (for real-time updates)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedData = localStorage.getItem('profileData');
+      if (savedData) setProfileData(JSON.parse(savedData));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLogout = () => {
@@ -37,20 +56,18 @@ export default function AdminDashboard() {
 
   return (
     <div 
-    className="min-h-screen font-sans text-gray-900 pb-20 uppercase"
-    style={{
-      backgroundImage: `url(${backgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed',
-      backgroundRepeat: 'no-repeat'
-    }}
-  >
-    <Toaster position="top-center" richColors />
-    
-    {/* HEADER SECTION... */}
+      className="min-h-screen font-sans text-gray-900 pb-20 uppercase"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <Toaster position="top-center" richColors />
       
-      {/* HEADER SECTION (image_7915fb.png) */}
+      {/* HEADER SECTION */}
       <header className="bg-white border-b-4 border-blue-600 sticky top-0 z-50 p-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -76,7 +93,7 @@ export default function AdminDashboard() {
 
       <main className="max-w-5xl mx-auto p-8 space-y-10 uppercase">
         
-        {/* TITLE CARD (image_7915fb.png) */}
+        {/* TITLE CARD */}
         <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-blue-100"></div>
           <div className="flex justify-between items-start mb-4">
@@ -93,7 +110,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* I. BASIC LGU INFO (image_7915fb.png) */}
+        {/* I. BASIC LGU INFO */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
           <div className="p-6 border-b border-gray-100 font-black text-gray-800 tracking-tight flex items-center gap-2">
             <LayoutDashboard size={20} className="text-blue-600" /> I. Basic LGU Information
@@ -114,7 +131,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* LOCAL GOVERNMENT OFFICIALS (image_79161c.png) */}
+        {/* LOCAL GOVERNMENT OFFICIALS */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
           <div className="p-6 border-b border-gray-100 font-black text-gray-800 tracking-tight flex items-center gap-2">
             <Users size={18} className="text-blue-600"/> Local Government Officials
@@ -133,7 +150,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* II. PROFILE OF ASSETS (image_79161c.png, image_79163c.png) */}
+        {/* II. PROFILE OF ASSETS */}
         <section className="space-y-6">
           <div className="bg-cyan-500 p-3 rounded-md shadow-md font-black text-white text-center tracking-[0.3em] text-sm">II. Profile of Tourism Resources and Assets</div>
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -183,7 +200,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* E. TRANSPORTATION (image_79165b.png) */}
+        {/* E. TRANSPORTATION */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
           <div className="p-4 bg-gray-50 border-b border-gray-100 font-black text-gray-600 text-xs tracking-widest">E. Transportation</div>
           <table className="w-full text-left border-collapse">
@@ -208,7 +225,7 @@ export default function AdminDashboard() {
           </table>
         </section>
 
-        {/* III. INSTITUTIONAL ELEMENTS (image_79167a.png) */}
+        {/* III. INSTITUTIONAL ELEMENTS */}
         <section className="space-y-6">
           <div className="bg-cyan-500 p-3 rounded-md shadow-md font-black text-white text-center tracking-[0.3em] text-sm">III. INSTITUTIONAL ELEMENTS</div>
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -227,7 +244,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* F. LABOR FORCE (image_79167a.png) */}
+        {/* F. LABOR FORCE */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b font-black text-gray-800 text-sm tracking-tight">F. Labor Force</div>
           <table className="w-full text-left text-xs border-collapse font-black">
@@ -249,7 +266,7 @@ export default function AdminDashboard() {
           </table>
         </section>
 
-        {/* B. REVENUE CONTRIBUTIONS (image_791928.png) */}
+        {/* B. REVENUE CONTRIBUTIONS */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b font-black text-gray-800 text-sm tracking-tight uppercase">B. Total Revenue Contributions to LGU for the Past 3 Years</div>
           <table className="w-full text-left text-xs border-collapse font-black">
@@ -272,7 +289,7 @@ export default function AdminDashboard() {
           </table>
         </section>
 
-        {/* C. EMERGENCY & D. TOURISM EDUCATION (image_791928.png) */}
+        {/* C. EMERGENCY & D. TOURISM EDUCATION */}
         <div className="space-y-10">
           <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <div className="p-4 border-b font-black text-gray-800 text-sm tracking-tight">C. Emergency Contacts</div>
@@ -304,7 +321,7 @@ export default function AdminDashboard() {
           </section>
         </div>
 
-        {/* E. TOURISM PROJECTS (image_791949.png) */}
+        {/* E. TOURISM PROJECTS */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b font-black text-gray-800 text-sm tracking-tight">E. Tourism Projects in the Past 5 Years</div>
           <table className="w-full text-left text-[10px] border-collapse uppercase font-bold">
@@ -315,7 +332,7 @@ export default function AdminDashboard() {
           </table>
         </section>
 
-        {/* F. PEACE AND ORDER (image_791949.png) */}
+        {/* F. PEACE AND ORDER */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b font-black text-gray-800 flex items-center gap-2 text-sm tracking-tight">
             <ShieldAlert size={18} className="text-orange-500"/> F. Peace and Order and Incidence of Crime
@@ -337,7 +354,7 @@ export default function AdminDashboard() {
           </table>
         </section>
 
-        {/* G. HAZARD MATRIX (image_791968.png) */}
+        {/* G. HAZARD MATRIX */}
         <section className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden pb-10 uppercase">
           <div className="p-4 border-b font-black text-gray-800 flex items-center gap-2 text-sm tracking-tight">
             <AlertTriangle size={18} className="text-yellow-500"/> G. Hazard Matrix
@@ -361,7 +378,7 @@ export default function AdminDashboard() {
 
       </main>
 
-      {/* FOOTER (image_791968.png) */}
+      {/* FOOTER */}
       <footer className="py-10 bg-[#1e293b] text-center border-t border-gray-200">
         <p className="text-[11px] font-black text-white uppercase tracking-[0.3em] mb-2">© 2026 Municipality of Panglao - Office of the Municipal Tourism Officer</p>
         <p className="text-[10px] text-gray-400 font-bold tracking-widest">Republic of the Philippines | Province of Bohol</p>

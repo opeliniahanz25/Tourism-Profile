@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import { Plus, Trash2, Building2, TableProperties } from "lucide-react";
 
 export default function TabAccomodation({ editData, setEditData }: { editData: any, setEditData: any }) {

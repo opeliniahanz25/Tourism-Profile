@@ -55,7 +55,11 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route 
           path="/dashboard" 
-          element={<ProtectedRoute><AdminDashboard data={tourismData} /></ProtectedRoute>} 
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />  {/* REMOVED the data prop */}
+            </ProtectedRoute>
+          } 
         />
         <Route 
           path="/admin-panel" 

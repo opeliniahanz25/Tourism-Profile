@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Info, Users, MapPin, Building2, Bus, School, ShieldAlert } from "lucide-react";
@@ -15,28 +14,59 @@ import TabTransport from './TabTransport';
 import TabInstitutional from './TabInstitutional';
 import TabSafety from './TabSafety';
 
-export default function AdminPanel() {
+// Define props interface
+interface AdminPanelProps {
+  editData: any;
+  setEditData: React.Dispatch<React.SetStateAction<any>>;
+  onSave: () => void;
+}
+
+export default function AdminPanel({ editData: propEditData, setEditData: propSetEditData, onSave: propOnSave }: AdminPanelProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Basic Info");
+  
+  // Use local state but sync with props
   const [editData, setEditData] = useState<ProfileData>(initialProfileData);
 
-  // Load data from LocalStorage on mount
+  // Sync with props when they change
+  useEffect(() => {
+    if (propEditData) {
+      setEditData(propEditData);
+    }
+  }, [propEditData]);
+
+  // Load data from LocalStorage on mount (fallback)
   useEffect(() => {
     const saved = localStorage.getItem('profileData');
-    if (saved) {
+    if (saved && !propEditData) {
       try {
         setEditData(JSON.parse(saved));
       } catch (e) {
         console.error("Error parsing profile data:", e);
       }
     }
-  }, []);
+  }, [propEditData]);
 
   const handleSave = () => {
+    // Save to localStorage
     localStorage.setItem('profileData', JSON.stringify(editData));
+    
+    // Call the parent's onSave function if provided
+    if (propOnSave) {
+      propOnSave();
+    }
+    
     toast.success('PROFILE CHANGES SAVED!', { 
       style: { background: '#00a859', color: '#fff' } 
     });
+  };
+
+  // Custom setter that updates both local state and parent state
+  const handleSetEditData = (newData: any) => {
+    setEditData(newData);
+    if (propSetEditData) {
+      propSetEditData(newData);
+    }
   };
 
   const tabs = [
@@ -86,13 +116,13 @@ export default function AdminPanel() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 min-h-[600px] uppercase font-black">
-          {activeTab === "Basic Info" && <TabBasicInfo editData={editData} setEditData={setEditData} />}
-          {activeTab === "Officials" && <TabOfficials editData={editData} setEditData={setEditData} />}
-          {activeTab === "Attractions" && <TabAttractions editData={editData} setEditData={setEditData} />}
-          {activeTab === "Accommodation" && <TabAccomodation editData={editData} setEditData={setEditData} />}
-          {activeTab === "Transport" && <TabTransport editData={editData} setEditData={setEditData} />}
-          {activeTab === "Institutional" && <TabInstitutional editData={editData} setEditData={setEditData} />}
-          {activeTab === "Safety" && <TabSafety editData={editData} setEditData={setEditData} />}
+          {activeTab === "Basic Info" && <TabBasicInfo editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Officials" && <TabOfficials editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Attractions" && <TabAttractions editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Accommodation" && <TabAccomodation editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Transport" && <TabTransport editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Institutional" && <TabInstitutional editData={editData} setEditData={handleSetEditData} />}
+          {activeTab === "Safety" && <TabSafety editData={editData} setEditData={handleSetEditData} />}
         </div>
       </main>
     </div>

@@ -1,10 +1,10 @@
-import * as React from "react";
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Save, Info, Users, MapPin, 
   Building2, Bus, School, GraduationCap, ShieldAlert, 
-  Plus, HardHat, Banknote, AlertTriangle, Check, Upload
+  Plus, Upload
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import backgroundImage from '../assets/background.jpg';
