@@ -1,19 +1,15 @@
 import { EmptyRow } from './Common';
-// Import the component directly from your independent file
 import TourismAsst from './TourismAsst';
 
 export default function TourismAssets({ data }: { data: any }) {
-  // 'data' here is profileData.tourismAssets passed from AdminDashboard
   const attractions = data?.attractions || [];
 
   return (
     <section className="space-y-10">
-      {/* MAIN TITLE */}
       <div className="bg-cyan-600 p-3 rounded-md shadow-md text-white text-center tracking-[0.3em] text-sm font-black uppercase">
         II. Profile of Tourism Resources and Assets
       </div>
 
-      {/* A. ATTRACTIONS */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
         <h3 className="text-xs font-bold text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
           A. Tourism Attractions and Activities
@@ -46,12 +42,11 @@ export default function TourismAssets({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* B. MAP */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
         <h3 className="text-xs font-bold text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
           B. Local Tourism Map
         </h3>
-        <div className="flex justify-center items-center bg-gray-50 rounded-lg min-h-[400px] border border-dashed border-gray-200">
+        <div className="flex justify-center items-center bg-gray-50 rounded-lg min-h-100 border border-dashed border-gray-200">
           {data?.tourismMap ? (
             <img src={data.tourismMap} alt="Map" className="max-w-full h-auto object-contain shadow-lg rounded" />
           ) : (
@@ -60,10 +55,7 @@ export default function TourismAssets({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* INDEPENDENT SECTIONS C AND D */}
-      {/* We pass the whole 'data' object so it can extract accommodations and facilities itself */}
       <TourismAsst data={data} />
-
     </section>
   );
 }

@@ -1,15 +1,11 @@
 import { EmptyRow } from './Common';
 
-/**
- * THIS FILE INDEPENDENTLY HANDLES SECTIONS C AND D
- */
 export default function TourismAsst({ data }: { data: any }) {
   const accommodations = data?.accommodations || [];
   const facilities = data?.facilities || [];
 
   return (
     <div className="space-y-10">
-      {/* C. ACCOMMODATION FACILITIES */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
         <h3 className="text-xs font-bold text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
           C. Accommodation Facilities
@@ -42,7 +38,6 @@ export default function TourismAsst({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* D. OTHER TOURISM-RELATED FACILITIES */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
         <h3 className="text-xs font-black text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
           D. Other Tourism-Related Facilities

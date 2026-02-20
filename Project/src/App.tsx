@@ -1,11 +1,12 @@
 import * as React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AdminDashboard from './Components/DASH/AdminDashboard';
 import AdminPanel from './Components/PANEL/AdminPanel'; 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Components/Login';
 import SignUp from './Components/SignUp';
 import './index.css';
 
+// Simple Route Guard
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = localStorage.getItem('user');
   return user ? <>{children}</> : <Navigate to="/" replace />;
@@ -13,13 +14,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 export default function App() {
   const [tourismData, setTourismData] = React.useState({
-    // Standard Info
     basicInfo: { name: "PANGLAO", province: "BOHOL", region: "VII" },
     officials: { mayor: "", viceMayor: "", council: ["", "", "", "", "", "", "", ""], tourismOfficer: "", planningCoordinator: "" },
     tourismAssets: { attractions: [], accommodations: [], profiles: [], facilities: [] },
     transportation: {}, 
-    
-    // Institutional (Flat Structure - No "institutional" folder)
+    // Institutional Flat Structure
     institutionalFacilities: [],
     laborForce: {},
     revenueData: {},
@@ -30,13 +29,15 @@ export default function App() {
     hazardMatrix: {}
   });
 
+  // THE BRIDGE: Saves data and notifies other components
   const handleSave = () => {
     localStorage.setItem('tourism_data', JSON.stringify(tourismData));
-    // The "Ping" that wakes up the Dashboard
+    // This custom event allows the dashboard to update even in the same tab
     window.dispatchEvent(new Event("storage"));
-    alert("DATABASE FULLY UPDATED!");
+    alert("DATABASE UPDATED SUCCESSFULLY!");
   };
 
+  // Initial Load
   React.useEffect(() => {
     const saved = localStorage.getItem('tourism_data');
     if (saved) {
@@ -53,14 +54,16 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        
         <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <AdminDashboard />  {/* REMOVED the data prop */}
+              <AdminDashboard />
             </ProtectedRoute>
           } 
         />
+
         <Route 
           path="/admin-panel" 
           element={
@@ -73,6 +76,7 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

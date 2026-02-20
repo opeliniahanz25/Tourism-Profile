@@ -31,7 +31,6 @@ export default function BasicInfo({ data }: { data: any }) {
           </div>
         </div>
 
-        {/* FIXED: Religion now correctly maps to data.religion */}
         <div className="p-4 font-black">
           <span className="text-[10px] text-gray-400 block mb-1 tracking-widest">Religion:</span>
           {data?.religion || "N/A"}

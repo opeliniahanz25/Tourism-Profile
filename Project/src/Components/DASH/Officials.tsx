@@ -1,4 +1,3 @@
-
 import { Users } from "lucide-react";
 
 export default function Officials({ data }: { data: any }) {
@@ -17,7 +16,7 @@ export default function Officials({ data }: { data: any }) {
           ))}
         </div>
         <div className="p-4 flex gap-2"><span className="text-gray-400 text-[10px] w-32 tracking-widest">Tourism Officer:</span>{data?.tourismOfficer}</div>
-        <div className="p-4 flex gap-2"><span className="text-gray-400 text-[10px] w-70  tracking-widest">Planning and Development Coordinator:</span>{data?.planningCoordinator}</div>
+        <div className="p-4 flex gap-2"><span className="text-gray-400 text-[10px] w-70 tracking-widest">Planning and Development Coordinator:</span>{data?.planningCoordinator}</div>
       </div>
     </section>
   );

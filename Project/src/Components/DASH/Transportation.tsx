@@ -1,4 +1,4 @@
-export default function Transportation({ data }: { data: any[] }) {
+export default function Transportation({ data }: { data: any }) {
   const categories = ['JEEPNEY', 'BUS', 'VAN', 'AIRPLANE', 'BOAT', 'TRICYCLE', 'HABAL-HABAL', 'OTHERS:'];
 
   return (
@@ -17,8 +17,10 @@ export default function Transportation({ data }: { data: any[] }) {
         </thead>
         <tbody className="divide-y divide-gray-100 font-black text-gray-800">
           {categories.map((t) => {
-            // Find data match (case insensitive)
-            const item = data?.find((d: any) => d.type?.toUpperCase() === t.toUpperCase());
+            const item = Array.isArray(data) 
+              ? data.find((d: any) => d.type?.toUpperCase() === t.toUpperCase())
+              : data?.[t];
+
             return (
               <tr key={t} className="hover:bg-gray-50 font-black text-[11px]">
                 <td className="p-4 border-r border-gray-100 uppercase bg-gray-50/20">{t}</td>

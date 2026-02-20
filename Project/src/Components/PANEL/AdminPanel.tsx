@@ -115,7 +115,7 @@ export default function AdminPanel({ editData: propEditData, setEditData: propSe
           ))}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 min-h-[600px] uppercase font-black">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 min-h-150 uppercase font-black">
           {activeTab === "Basic Info" && <TabBasicInfo editData={editData} setEditData={handleSetEditData} />}
           {activeTab === "Officials" && <TabOfficials editData={editData} setEditData={handleSetEditData} />}
           {activeTab === "Attractions" && <TabAttractions editData={editData} setEditData={handleSetEditData} />}

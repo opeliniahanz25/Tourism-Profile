@@ -66,9 +66,9 @@ const Login: React.FC = () => {
           </button>
 
           <div className="relative w-full flex items-center justify-center py-2">
-            <div className="flex-grow h-[1px] bg-gray-700"></div>
+            <div className="grow h-px bg-gray-700"></div>
             <span className="text-xs px-3 text-gray-500 uppercase tracking-wider">Or</span>
-            <div className="flex-grow h-[1px] bg-gray-700"></div>
+            <div className="grow h-px bg-gray-700"></div>
           </div>
 
           <div className="relative w-full flex items-center justify-evenly py-2 gap-4">

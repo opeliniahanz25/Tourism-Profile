@@ -1,52 +1,78 @@
-
+import { ShieldAlert, AlertTriangle } from "lucide-react";
 
 export default function TabSafety({ editData, setEditData }: { editData: any, setEditData: any }) {
-  const handleInputChange = (field: string, value: string) => {
+  
+  // Reuse the nested update logic for Hazards
+  const updateNestedData = (section: string, category: string, field: string, value: string) => {
     setEditData({
       ...editData,
-      [field]: value
+      [section]: {
+        ...editData[section],
+        [category]: {
+          ...editData[section]?.[category],
+          [field]: value.toUpperCase()
+        }
+      }
     });
   };
 
   return (
     <div className="space-y-12 animate-in fade-in duration-300 uppercase font-black">
-      <section className="space-y-6">
-        <h3 className="text-sm font-black text-gray-800 border-b pb-3 mb-6 uppercase">PEACE AND ORDER - INCIDENCE OF CRIME</h3>
-        <div className="space-y-2">
-          {["KIDNAPPING", "DROWNING", "PETTY THEFT", "ROAD ACCIDENTS", "HARASSMENT", "DRUGS"].map((crime) => (
-            <div key={crime} className="flex justify-between items-center gap-10 p-2 border-b border-gray-50 font-black">
-              <span className="text-[11px] font-black text-gray-600 w-1/3 uppercase">{crime}</span>
+      
+      {/* SECTION F: PEACE AND ORDER */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-black text-blue-600 flex items-center gap-2">
+          <ShieldAlert size={16}/> F. Peace and Order
+        </h3>
+        <div className="grid grid-cols-1 gap-2">
+          {["Kidnapping", "Drowning", "Petty theft", "Road accidents", "Prohibited drugs", "Trafficking", "Others:"].map((incident) => (
+            <div key={incident} className="grid grid-cols-12 gap-4 items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="col-span-4 text-[10px] font-black">{incident}</span>
               <input 
-                className="flex-1 bg-[#f3f4f6] rounded-lg px-4 py-2 text-[10px] font-black outline-none" 
-                placeholder="DESCRIPTION"
-                value={editData?.[crime] || ''}
-                onChange={(e) => handleInputChange(crime, e.target.value)}
+                className="col-span-8 p-2 text-[10px] border rounded bg-white font-black" 
+                placeholder="STATUS/DESCRIPTION" 
+                value={editData.crimeIncidents?.[incident] || ""} 
+                onChange={(e) => {
+                  setEditData({ 
+                    ...editData, 
+                    crimeIncidents: { 
+                      ...editData.crimeIncidents, 
+                      [incident]: e.target.value.toUpperCase() 
+                    }
+                  });
+                }} 
               />
             </div>
           ))}
         </div>
       </section>
 
-      <section className="pt-10 border-t font-black">
-        <h3 className="text-sm font-black text-gray-800 mb-6 uppercase">HAZARD MATRIX</h3>
-        {['EARTHQUAKE', 'LANDSLIDE', 'STORM SURGE', 'TSUNAMI'].map((hazard) => (
-          <div key={hazard} className="p-4 bg-[#f9fafb] rounded-xl mb-4 grid grid-cols-3 gap-4">
-            <div className="col-span-1 font-black text-blue-600 text-xs self-center">{hazard}</div>
-            <input 
-              className="bg-white rounded px-3 py-2 text-[10px]" 
-              placeholder="LOCATION"
-              value={editData?.[`${hazard}_location`] || ''}
-              onChange={(e) => handleInputChange(`${hazard}_location`, e.target.value)}
-            />
-            <input 
-              className="bg-white rounded px-3 py-2 text-[10px]" 
-              placeholder="POPULATION AFFECTED"
-              value={editData?.[`${hazard}_population`] || ''}
-              onChange={(e) => handleInputChange(`${hazard}_population`, e.target.value)}
-            />
-          </div>
-        ))}
+      {/* SECTION G: HAZARD MATRIX */}
+      <section className="space-y-4 pt-6 border-t border-gray-100 pb-10">
+        <h3 className="text-sm font-black text-blue-600 flex items-center gap-2">
+          <AlertTriangle size={16}/> G. Hazard Matrix
+        </h3>
+        <div className="space-y-2">
+          {['Earthquake', 'Landslide', 'Storm Surge', 'Tsunami', 'Others:'].map((hazard) => (
+            <div key={hazard} className="grid grid-cols-12 gap-4 items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="col-span-3 text-[10px]">{hazard}</span>
+              <input 
+                className="col-span-5 p-2 text-[10px] border rounded bg-white font-black" 
+                placeholder="LOCATION" 
+                value={editData.hazardMatrix?.[hazard]?.location || ""} 
+                onChange={(e) => updateNestedData('hazardMatrix', hazard, 'location', e.target.value)} 
+              />
+              <input 
+                className="col-span-4 p-2 text-[10px] border rounded bg-white font-black" 
+                placeholder="POPULATION AFFECTED" 
+                value={editData.hazardMatrix?.[hazard]?.population || ""} 
+                onChange={(e) => updateNestedData('hazardMatrix', hazard, 'population', e.target.value)} 
+              />
+            </div>
+          ))}
+        </div>
       </section>
+
     </div>
   );
 }
