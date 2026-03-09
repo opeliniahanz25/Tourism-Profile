@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import bgImage from "../../public/assets/Background.jpg";
 import shesh from "../../public/assets/shesh.png";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import { FaFingerprint, FaEye, FaRegEyeSlash, FaFacebook, FaTwitter, FaGoogle } from "react-icons/fa";
+import { FaFingerprint, FaEye, FaRegEyeSlash} from "react-icons/fa";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -24,6 +24,7 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // UPDATED: This now saves the full user object (including fullName) from the DB
         localStorage.setItem('user', JSON.stringify(data.user || { email }));
         navigate('/dashboard'); 
       } else {
@@ -65,7 +66,7 @@ const Login: React.FC = () => {
             {loading ? "Logging in..." : "Log in"}
           </button>
 
-          <div className="relative w-full flex items-center justify-center py-2">
+          {/* <div className="relative w-full flex items-center justify-center py-2">
             <div className="grow h-px bg-gray-700"></div>
             <span className="text-xs px-3 text-gray-500 uppercase tracking-wider">Or</span>
             <div className="grow h-px bg-gray-700"></div>
@@ -75,7 +76,7 @@ const Login: React.FC = () => {
             <div className="flex-1 flex justify-center p-3 bg-slate-700 cursor-pointer rounded-xl hover:bg-slate-800"><FaFacebook className="text-white text-xl" /></div>
             <div className="flex-1 flex justify-center p-3 bg-slate-700 cursor-pointer rounded-xl hover:bg-slate-800"><FaGoogle className="text-white text-xl" /></div>
             <div className="flex-1 flex justify-center p-3 bg-slate-700 cursor-pointer rounded-xl hover:bg-slate-800"><FaTwitter className="text-white text-xl" /></div>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

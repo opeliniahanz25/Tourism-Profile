@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Plus, Trash2, Image as ImageIcon, Upload, TableProperties } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, Upload, TableProperties, X } from "lucide-react";
 
 export default function TabAttractions({ editData, setEditData }: { editData: any, setEditData: any }) {
   
-  // Helper to get current assets safely
   const currentAssets = editData.tourismAssets || { attractions: [], tourismMap: "" };
 
   const updateAttraction = (index: number, field: string, value: string) => {
@@ -37,14 +36,37 @@ export default function TabAttractions({ editData, setEditData }: { editData: an
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditData({ 
-          ...editData, 
-          tourismAssets: { ...currentAssets, tourismMap: reader.result as string } 
-        });
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800; 
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+            
+            setEditData({ 
+              ...editData, 
+              tourismAssets: { ...currentAssets, tourismMap: compressedBase64 } 
+            });
+          }
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const removeMap = () => {
+    setEditData({ 
+      ...editData, 
+      tourismAssets: { ...currentAssets, tourismMap: "" } 
+    });
   };
 
   return (
@@ -86,10 +108,16 @@ export default function TabAttractions({ editData, setEditData }: { editData: an
           <Upload size={16} /> {currentAssets.tourismMap ? "Change Map Image" : "Upload Map Image"}
           <input type="file" className="hidden" accept="image/*" onChange={handleMapUpload} />
         </label>
+
         {currentAssets.tourismMap && (
           <div className="mt-4 flex flex-col items-center">
-            <p className="text-[9px] text-green-600 font-bold uppercase mb-2">✓ Image Loaded</p>
-            <img src={currentAssets.tourismMap} className="h-20 w-auto rounded border shadow-sm" alt="Preview" />
+            <p className="text-[9px] text-green-600 font-bold uppercase mb-2">✓ Image Optimized & Ready</p>
+            <div className="relative group inline-block">
+              <img src={currentAssets.tourismMap} className="h-48 w-auto rounded border shadow-sm" alt="Preview" />
+              <button onClick={removeMap} className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700">
+                <X size={14} strokeWidth={3} />
+              </button>
+            </div>
           </div>
         )}
       </div>

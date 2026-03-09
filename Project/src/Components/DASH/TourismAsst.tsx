@@ -2,32 +2,41 @@ import { EmptyRow } from './Common';
 
 export default function TourismAsst({ data }: { data: any }) {
   const accommodations = data?.accommodations || [];
-  const facilities = data?.facilities || [];
+  const facilities = data?.facilities || []; 
 
   return (
     <div className="space-y-10">
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
-        <h3 className="text-xs font-bold text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
+      {/* SECTION C: Accommodation Facilities */}
+      <div className="bg-white/20 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-2xl p-6 overflow-hidden">
+        <h3 className="text-xs font-black text-blue-700 mb-4 uppercase tracking-widest border-b border-white/20 pb-2 drop-shadow-sm">
           C. Accommodation Facilities
         </h3>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300 text-xs text-left">
-            <thead className="bg-gray-50 text-gray-400 font-black uppercase">
+          <table className="w-full border-collapse text-xs text-left">
+            <thead className="bg-white/10 text-gray-600 font-black uppercase border-b border-white/20">
               <tr>
-                <th className="p-4 border border-gray-300">Name of Establishment</th>
-                <th className="p-4 border border-gray-300 text-center w-24">Rooms</th>
-                <th className="p-4 border border-gray-300 text-center w-24">Capacity</th>
-                <th className="p-4 border border-gray-300">Location</th>
+                <th className="p-4 border-r border-white/20">NATURE</th>
+                <th className="p-4 border-r border-white/20 text-center">ESTABLISHMENT/FACILITY</th>
+                <th className="p-4 border-r border-white/20 text-center">LOCATION</th>
+                <th className="p-4">CONTACT DETAILS</th>
               </tr>
             </thead>
             <tbody className="font-black uppercase text-gray-800">
               {accommodations.length > 0 ? (
                 accommodations.map((item: any, i: number) => (
-                  <tr key={i} className="hover:bg-gray-50 h-12 transition-colors">
-                    <td className="p-4 border border-gray-300">{item.name || ""}</td>
-                    <td className="p-4 border border-gray-300 text-center">{item.rooms || "-"}</td>
-                    <td className="p-4 border border-gray-300 text-center">{item.capacity || "-"}</td>
-                    <td className="p-4 border border-gray-300">{item.location || ""}</td>
+                  <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
+                    <td className="p-4 border-r border-white/10 whitespace-normal wrap-break-words leading-normal min-w-37.5 drop-shadow-sm">
+                      {item.name || ""}
+                    </td>
+                    <td className="p-4 border-r border-white/10 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.rooms || "-"}
+                    </td>
+                    <td className="p-4 border-r border-white/10 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.capacity || "-"}
+                    </td>
+                    <td className="p-4 whitespace-normal wrap-break-words leading-normal min-w-37.5 drop-shadow-sm">
+                      {item.location || ""}
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -38,30 +47,45 @@ export default function TourismAsst({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6">
-        <h3 className="text-xs font-black text-blue-600 mb-4 uppercase tracking-widest border-b pb-2">
-          D. Other Tourism-Related Facilities
+      {/* SECTION D: Accommodation Profile */}
+      <div className="bg-white/20 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-2xl p-6 overflow-hidden">
+        <h3 className="text-xs font-black text-blue-700 mb-4 uppercase tracking-widest border-b border-white/20 pb-2 drop-shadow-sm">
+          D. Accommodation Profile
         </h3>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300 text-xs text-left">
-            <thead className="bg-gray-50 text-gray-400 font-black uppercase">
+          <table className="w-full border-collapse text-xs text-left">
+            <thead className="bg-white/10 text-gray-600 font-black uppercase border-b border-white/20">
               <tr>
-                <th className="p-4 border border-gray-300 w-1/3">Facility Type</th>
-                <th className="p-4 border border-gray-300">Name / Description</th>
-                <th className="p-4 border border-gray-300">Location</th>
+                <th className="p-4 border-r border-white/20">NAME OF THE ESTABLISHMENT</th>
+                <th className="p-4 border-r border-white/20 text-center">TYPE</th>
+                <th className="p-4 border-r border-white/20 text-center"># OF ROOMS</th>
+                <th className="p-4 border-r border-white/20 text-center">AVERAGE RATE</th>
+                <th className="p-4 text-center">OCCUPANCY RATE</th>
               </tr>
             </thead>
             <tbody className="font-black uppercase text-gray-800">
               {facilities.length > 0 ? (
                 facilities.map((item: any, i: number) => (
-                  <tr key={i} className="hover:bg-gray-50 h-12 transition-colors">
-                    <td className="p-4 border border-gray-300">{item.type || ""}</td>
-                    <td className="p-4 border border-gray-300">{item.name || ""}</td>
-                    <td className="p-4 border border-gray-300">{item.location || ""}</td>
+                  <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
+                    <td className="p-4 border-r border-white/10 whitespace-normal wrap-break-words leading-normal min-w-45 drop-shadow-sm">
+                      {item.name || "-"}
+                    </td>
+                    <td className="p-4 border-r border-white/10 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.type || "-"}
+                    </td>
+                    <td className="p-4 border-r border-white/10 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.rooms || "-"}
+                    </td>
+                    <td className="p-4 border-r border-white/10 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.rate || "-"}
+                    </td>
+                    <td className="p-4 text-center whitespace-normal wrap-break-words drop-shadow-sm">
+                      {item.occupancy || "-"}
+                    </td>
                   </tr>
                 ))
               ) : (
-                <EmptyRow colSpan={3} message="No additional facilities listed." />
+                <EmptyRow colSpan={5} message="No profile data available." />
               )}
             </tbody>
           </table>

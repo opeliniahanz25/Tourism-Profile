@@ -1,46 +1,43 @@
 export interface ProfileData {
-  basicInfo: any;
+  basicInfo: {
+    name: string; province: string; region: string; population: string;
+    landArea: string; barangays: string; religions: string; languages: string;
+    economicActivities: string;
+  };
   officials: {
     mayor: string;
     viceMayor: string;
     council: string[];
     tourismOfficer: string;
     planningCoordinator: string;
+    skFederationPresident: string;
+    skMembers: any[];
   };
-  tourismAssets: {
-    attractions: any[];
-    accommodations: any[];
-    profiles: any[];
+  tourismAssets: { attractions: any[]; accommodations: any[]; facilities: any[]; tourismMap: string; };
+  transportation: { list: any[]; };
+  institutional: {
+    institutionalFacilities: any[];
+    laborForce: any;
+    revenueData: any;
+    revenueYears: string[];
   };
-  transportation: any[];
-  institutional: any;
+  // --- ADDED FOR SAFETY SYNC ---
+  crimeIncidents: Record<string, string>;
+  hazardMatrix: Record<string, any>;
 }
 
 export const initialProfileData: ProfileData = {
-  basicInfo: {
-    name: "PANGLAO",
-    province: "BOHOL",
-    region: "REGION VII",
-    population: "",
-    landArea: "",
-    barangays: "",
-    ethnicGroups: "",
-    religions: "",
-    languages: "",
-    economicActivities: ""
+  basicInfo: { name: "", province: "", region: "", population: "", landArea: "", barangays: "", religions: "", languages: "", economicActivities: "" },
+  officials: { mayor: "", viceMayor: "", council: Array(10).fill(""), tourismOfficer: "", planningCoordinator: "", skFederationPresident: "", skMembers: [] },
+  tourismAssets: { attractions: [], accommodations: [], facilities: [], tourismMap: "" },
+  transportation: { list: [] },
+  institutional: {
+    institutionalFacilities: [],
+    laborForce: {},
+    revenueData: {},
+    revenueYears: ['y1', 'y2', 'y3']
   },
-  officials: {
-    mayor: "",
-    viceMayor: "",
-    council: ["", "", "", "", "", "", "", ""],
-    tourismOfficer: "",
-    planningCoordinator: ""
-  },
-  tourismAssets: {
-    attractions: [],
-    accommodations: [],
-    profiles: []
-  },
-  transportation: [],
-  institutional: {}
+  // --- INITIALIZE SAFETY FIELDS ---
+  crimeIncidents: {},
+  hazardMatrix: {}
 };

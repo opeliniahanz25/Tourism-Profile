@@ -1,5 +1,5 @@
-
 import { Plus, Trash2, Building2, TableProperties } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function TabAccomodation({ editData, setEditData }: { editData: any, setEditData: any }) {
   
@@ -7,6 +7,18 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
   const currentAssets = editData.tourismAssets || {};
   const accommodations = currentAssets.accommodations || [];
   const facilities = currentAssets.facilities || [];
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // --- AUTO RESIZE LOGIC FOR REFRESH/LOAD ---
+  useEffect(() => {
+    if (containerRef.current) {
+      const textareas = containerRef.current.querySelectorAll('textarea');
+      textareas.forEach((textarea: any) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+    }
+  }, [accommodations, facilities, editData]); // Re-runs when data loads or changes
 
   // --- SECTION C: ACCOMMODATIONS ---
   const updateAccom = (index: number, field: string, value: string) => {
@@ -35,7 +47,7 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
     });
   };
 
-  // --- SECTION D: OTHER FACILITIES ---
+  // --- SECTION D: OTHER FACILITIES (Accommodation Profile) ---
   const updateFacility = (index: number, field: string, value: string) => {
     const newList = [...facilities];
     newList[index] = { ...newList[index], [field]: value.toUpperCase() };
@@ -46,7 +58,7 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
   };
 
   const addFacilityRow = () => {
-    const newList = [...facilities, { type: "", name: "", location: "" }];
+    const newList = [...facilities, { name: "", type: "", rooms: "", rate: "", occupancy: "" }];
     setEditData({ 
       ...editData, 
       tourismAssets: { ...currentAssets, facilities: newList } 
@@ -62,8 +74,14 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
     });
   };
 
+  // Helper to auto-resize textarea while typing
+  const autoResize = (e: any) => {
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+  };
+
   return (
-    <div className="space-y-10 animate-in fade-in duration-300 font-black">
+    <div ref={containerRef} className="space-y-10 animate-in fade-in duration-300 font-black">
       
       {/* SECTION C: ACCOMMODATIONS EDITOR */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
@@ -78,16 +96,40 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
 
         <div className="space-y-2">
           {accommodations.map((item: any, index: number) => (
-            <div key={index} className="grid grid-cols-12 gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
-              <input className="col-span-4 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none" 
-                     value={item.name || ""} onChange={(e) => updateAccom(index, 'name', e.target.value)} placeholder="ESTABLISHMENT NAME" />
-              <input className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center" 
-                     value={item.rooms || ""} onChange={(e) => updateAccom(index, 'rooms', e.target.value)} placeholder="ROOMS" />
-              <input className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center" 
-                     value={item.capacity || ""} onChange={(e) => updateAccom(index, 'capacity', e.target.value)} placeholder="CAPACITY" />
-              <input className="col-span-3 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none" 
-                     value={item.location || ""} onChange={(e) => updateAccom(index, 'location', e.target.value)} placeholder="LOCATION" />
-              <button onClick={() => removeAccomRow(index)} className="col-span-1 flex justify-center items-center text-red-400 hover:text-red-600">
+            <div key={index} className="grid grid-cols-12 gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200 items-start">
+              <textarea 
+                className="col-span-4 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.name || ""} 
+                onChange={(e) => updateAccom(index, 'name', e.target.value)} 
+                placeholder="NAME OF ESTABLISHMENT" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.rooms || ""} 
+                onChange={(e) => updateAccom(index, 'rooms', e.target.value)} 
+                placeholder="ROOMS" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.capacity || ""} 
+                onChange={(e) => updateAccom(index, 'capacity', e.target.value)} 
+                placeholder="CAPACITY" 
+              />
+              <textarea 
+                className="col-span-3 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.location || ""} 
+                onChange={(e) => updateAccom(index, 'location', e.target.value)} 
+                placeholder="LOCATION" 
+              />
+              <button onClick={() => removeAccomRow(index)} className="col-span-1 flex justify-center items-center text-red-400 hover:text-red-600 self-center">
                 <Trash2 size={16} />
               </button>
             </div>
@@ -95,27 +137,61 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
         </div>
       </div>
 
-      {/* SECTION D: OTHER FACILITIES EDITOR */}
+      {/* SECTION D: ACCOMMODATION PROFILE EDITOR */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-sm font-black text-gray-800 uppercase flex items-center gap-2">
-            <TableProperties size={18} className="text-blue-600"/> D. Other Tourism-Related Facilities
+            <TableProperties size={18} className="text-blue-600"/> D. Accommodation Profile
           </h3>
           <button onClick={addFacilityRow} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase shadow-md active:scale-95 transition-all">
-            <Plus size={14} /> Add Facility
+            <Plus size={14} /> Add Profile Entry
           </button>
         </div>
 
         <div className="space-y-2">
           {facilities.map((item: any, index: number) => (
-            <div key={index} className="grid grid-cols-12 gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
-              <input className="col-span-3 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none" 
-                     value={item.type || ""} onChange={(e) => updateFacility(index, 'type', e.target.value)} placeholder="FACILITY TYPE" />
-              <input className="col-span-4 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none" 
-                     value={item.name || ""} onChange={(e) => updateFacility(index, 'name', e.target.value)} placeholder="NAME / DESCRIPTION" />
-              <input className="col-span-4 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none" 
-                     value={item.location || ""} onChange={(e) => updateFacility(index, 'location', e.target.value)} placeholder="LOCATION" />
-              <button onClick={() => removeFacilityRow(index)} className="col-span-1 flex justify-center items-center text-red-400 hover:text-red-600">
+            <div key={index} className="grid grid-cols-12 gap-1 bg-gray-50 p-2 rounded-lg border border-gray-200 items-start">
+              <textarea 
+                className="col-span-3 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.name || ""} 
+                onChange={(e) => updateFacility(index, 'name', e.target.value)} 
+                placeholder="NAME OF ESTABLISHMENT" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.type || ""} 
+                onChange={(e) => updateFacility(index, 'type', e.target.value)} 
+                placeholder="TYPE" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.rooms || ""} 
+                onChange={(e) => updateFacility(index, 'rooms', e.target.value)} 
+                placeholder="# OF ROOM" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.rate || ""} 
+                onChange={(e) => updateFacility(index, 'rate', e.target.value)} 
+                placeholder="AVERAGE RATE" 
+              />
+              <textarea 
+                className="col-span-2 bg-white border border-gray-300 rounded p-2 text-[10px] uppercase font-black outline-none text-center resize-none overflow-hidden min-h-8.75" 
+                rows={1}
+                onInput={autoResize}
+                value={item.occupancy || ""} 
+                onChange={(e) => updateFacility(index, 'occupancy', e.target.value)} 
+                placeholder="OCCUPANCY RATE" 
+              />
+              <button onClick={() => removeFacilityRow(index)} className="col-span-1 flex justify-center items-center text-red-400 hover:text-red-600 self-center">
                 <Trash2 size={16} />
               </button>
             </div>

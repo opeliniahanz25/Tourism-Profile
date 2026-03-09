@@ -9,4 +9,4 @@ const pool = new Pool({
   port: 20323,
 });
 
-export default pool; // Change module.exports to export default
+export default pool; // Change module.exports to export defaultz

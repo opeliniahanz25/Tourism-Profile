@@ -35,7 +35,7 @@ export default function TabBasicInfo({ editData, setEditData }: TabBasicInfoProp
           { id: 'region', label: 'Region' },
           { id: 'landArea', label: 'Land Area' },
           { id: 'barangays', label: 'Number of Barangays' },
-          { id: 'ethnicGroups', label: 'Ethnic Groups' }
+          { id: 'ethnicGroups', label: 'POPULATION' }
         ].map((field) => (
           <div key={field.id} className="space-y-1">
             <label className="text-[10px] font-black text-gray-400 tracking-widest uppercase">
@@ -73,8 +73,8 @@ export default function TabBasicInfo({ editData, setEditData }: TabBasicInfoProp
             <textarea 
               className="w-full bg-[#f3f4f6] border-none rounded-lg px-4 py-2 font-bold text-gray-700 outline-none uppercase focus:ring-2 focus:ring-blue-500/20 min-h-20 resize-none" 
               placeholder="E.G. ROMAN CATHOLIC, PROTESTANTISM"
-              value={(editData.basicInfo as any).religion || ""}
-              onChange={(e) => updateBasic('religion' as any, e.target.value.toUpperCase())}
+              value={(editData.basicInfo as any).religions || ""}
+              onChange={(e) => updateBasic('religions' as any, e.target.value.toUpperCase())}
             />
           </div>
 
