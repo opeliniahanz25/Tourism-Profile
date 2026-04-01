@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import bgImage from "../../public/assets/Background.jpg";
 import shesh from "../../public/assets/shesh.png";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import { FaFingerprint, FaEye, FaRegEyeSlash, FaUser } from "react-icons/fa"; // Added FaUser
+import { FaFingerprint, FaEye, FaRegEyeSlash } from "react-icons/fa"; // Added FaUser
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState(""); // New state for Name
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,11 +28,11 @@ const SignUp: React.FC = () => {
       const response = await fetch('http://localhost:3000/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, password })
+        body: JSON.stringify({  email, password })
       });
       const data = await response.json();
       if (response.ok) {
-        alert("Account created for " + fullName);
+        alert("Account created for " );
         navigate('/');
       } else {
         setError(data.message);
@@ -58,19 +57,7 @@ const SignUp: React.FC = () => {
 
         <form onSubmit={handleSignUp} className="w-full flex flex-col gap-4">
           
-          {/* NEW FULL NAME INPUT */}
-          <div className="w-full flex items-center bg-gray-800/80 p-3 rounded-lg gap-3 border border-transparent focus-within:border-blue-500 transition-all">
-            <FaUser className="text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Full Name (e.g. ITDEPARTMENT)" 
-              required 
-              value={fullName} 
-              onChange={(e) => setFullName(e.target.value)} 
-              className="bg-transparent w-full outline-none text-white text-sm" 
-            />
-          </div>
-
+          
           <div className="w-full flex items-center bg-gray-800/80 p-3 rounded-lg gap-3 border border-transparent focus-within:border-blue-500 transition-all">
             <MdOutlineAlternateEmail className="text-gray-400" />
             <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-transparent w-full outline-none text-white text-sm" />
