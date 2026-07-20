@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "shesh@gmail.com"
+    },
+    {
+      "id": 2,
+      "name": "james@gmail.com",
+      "email": "1234"
+    },
+    {
+      "id": 3,
+      "name": "james@gmail.com"
+    },
+    {
+      "id": 4,
+      "name": "james@gmail.com"
+    },
+    {
+      "id": 5,
+      "name": "james@gmail.com"
+    },
+    {
+      "id": 6,
+      "name": "123@gmail.com",
+      "email": "123"
+    },
+    {
+      "id": 7,
+      "name": "123@gmail.com"
+    },
+    {
+      "id": "8",
+      "email": "ppp@gmail.com",
+      "password": "1234"
+    }
+  ],
+  "lguData": {}
+}

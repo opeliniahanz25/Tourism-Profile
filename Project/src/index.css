@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+
+/* 4. TAILWIND v4 THEME CUSTOMIZATION */
+@theme {
+  /* Your specific login background variable */
+  --background-image-main: url('/Background.jpg');
+}
+
+/* 5. GLOBAL BASE STYLES */
+html, 
+body, 
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* Uses the background variable defined above */
+  background-image: var(--background-image-main);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  
+  /* Ensures background covers the screen even if the page content is short */
+  min-height: 100vh; 
+  background-attachment: fixed;
+}
