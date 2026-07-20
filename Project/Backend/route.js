@@ -33,7 +33,7 @@ app.post('/api/save-institutional', LGUController.saveInstitutional);
 app.post('/api/save-safety', LGUController.saveSafety);
 
 // Catch-All Handler: Serve index.html for React router paths (e.g., /dashboard)
-app.get('*', (req, res, next) => {
+app.get('/*', (req, res, next) => {
   // If the path matches an explicit backend endpoint, let the route logic handle it
   if (req.path.startsWith('/api') || req.path === '/login' || req.path === '/signup') {
     return next();
