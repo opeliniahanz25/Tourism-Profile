@@ -35,7 +35,8 @@ export default function BasicInfo({ data }: { data: any }) {
           </div>
           <div className="p-5 font-black hover:bg-white/20 transition-all duration-300">
             <span className="text-[10px] text-gray-600 mr-2 tracking-widest uppercase opacity-70">Land Area:</span>
-            {data?.landArea || "-"}
+            {/* ✅ FIXED: Fallback to land_area to handle strict PostgreSQL column formatting safely */}
+            {data?.landArea || data?.land_area || "-"}
           </div>
         </div>
 
@@ -48,7 +49,8 @@ export default function BasicInfo({ data }: { data: any }) {
         {/* RELIGION */}
         <div className="p-5 font-black hover:bg-white/20 transition-all duration-300">
           <span className="text-[10px] text-gray-600 block mb-1 tracking-widest uppercase opacity-70">Religion:</span>
-          {data?.religions || "N/A"}
+          {/* ✅ FIXED: Fallback to religion to handle structural variations between schemas */}
+          {data?.religions || data?.religion || "N/A"}
         </div>
 
         {/* LANGUAGES */}
@@ -60,7 +62,8 @@ export default function BasicInfo({ data }: { data: any }) {
         {/* ECONOMIC ACTIVITIES */}
         <div className="p-5 font-black hover:bg-white/20 transition-all duration-300">
           <span className="text-[10px] text-gray-600 block mb-1 tracking-widest uppercase opacity-70">Major Economic Activities:</span>
-          {data?.economicActivities || "N/A"}
+          {/* ✅ FIXED: Fallback to economic_activities for strict database alignment */}
+          {data?.economicActivities || data?.economic_activities || "N/A"}
         </div>
       </div>
     </section>

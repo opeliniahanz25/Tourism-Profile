@@ -9,7 +9,7 @@ import Officials from './Officials';
 import TourismAssets from './TourismAssets';
 import Transportation from './Transportation';
 import InstitutionalElements from './InstitutionalElements';
-import Safety from './Safety'; // IMPORTED HERE
+import Safety from './Safety';
 
 import backgroundImage from '../../../public/assets/Background.jpg';
 import { type ProfileData } from '../../data/profileData';
@@ -20,6 +20,52 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ profileData }: AdminDashboardProps) {
   const mainContentRef = useRef<HTMLElement>(null);
+
+  // --- DATABASE SCHEMA NORMALIZATION BRIDGE ---
+  // Safely normalizes camelCase and snake_case records from production database responses
+  const normalizedProfileData = {
+    ...profileData,
+    basicInfo: {
+      ...profileData.basicInfo,
+      religions: profileData.basicInfo?.religions || (profileData.basicInfo as any)?.religion || "",
+    },
+    officials: {
+      ...profileData.officials,
+      viceMayor: profileData.officials?.viceMayor || (profileData.officials as any)?.vice_mayor || "",
+      tourismOfficer: profileData.officials?.tourismOfficer || (profileData.officials as any)?.tourism_officer || "",
+      planningCoordinator: profileData.officials?.planningCoordinator || (profileData.officials as any)?.planning_coordinator || ""
+    },
+    tourismAssets: {
+      ...profileData.tourismAssets,
+      facilities: profileData.tourismAssets?.facilities || (profileData.tourismAssets as any)?.accommodation_profile || [],
+      accommodation_profile: (profileData.tourismAssets as any)?.accommodation_profile || profileData.tourismAssets?.facilities || [],
+      tourismMap: profileData.tourismAssets?.tourismMap || (profileData.tourismAssets as any)?.tourism_map || "",
+      tourism_map: (profileData.tourismAssets as any)?.tourism_map || profileData.tourismAssets?.tourismMap || ""
+    },
+    transportation: {
+      ...profileData.transportation,
+      list: profileData.transportation?.list || (Array.isArray(profileData.transportation) ? profileData.transportation : [])
+    },
+    institutional: profileData.institutional 
+      ? {
+          ...profileData.institutional,
+          labor_force: (profileData.institutional as any).labor_force || (profileData.institutional as any).laborForce || {},
+          laborForce: (profileData.institutional as any).laborForce || (profileData.institutional as any).labor_force || {},
+          revenue_data: (profileData.institutional as any).revenue_data || (profileData.institutional as any).revenueData || {},
+          revenueData: (profileData.institutional as any).revenueData || (profileData.institutional as any).revenue_data || {},
+          emergency_contacts: (profileData.institutional as any).emergency_contacts || (profileData.institutional as any).emergencyContacts || [],
+          emergencyContacts: (profileData.institutional as any).emergencyContacts || (profileData.institutional as any).emergency_contacts || [],
+          tourism_education: (profileData.institutional as any).tourism_education || (profileData.institutional as any).tourismEducation || [],
+          tourismEducation: (profileData.institutional as any).tourismEducation || (profileData.institutional as any).tourism_education || [],
+          tourism_projects: (profileData.institutional as any).tourism_projects || (profileData.institutional as any).tourismProjects || [],
+          tourismProjects: (profileData.institutional as any).tourismProjects || (profileData.institutional as any).tourism_projects || []
+        }
+      : (profileData as any).institutional || {},
+    crimeIncidents: profileData.crimeIncidents || (profileData as any).crime_incidents || {},
+    crime_incidents: (profileData as any).crime_incidents || profileData.crimeIncidents || {},
+    hazardMatrix: profileData.hazardMatrix || (profileData as any).hazard_matrix || {},
+    hazard_matrix: (profileData as any).hazard_matrix || profileData.hazardMatrix || {}
+  };
 
   const handleSaveToPC = async () => {
     if (!mainContentRef.current) return;
@@ -33,7 +79,7 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
           useCORS: true, 
           backgroundColor: '#ffffff' 
         },
-        output: `LGU_PROFILE_${profileData.basicInfo.name || 'PANGLAO'}.pdf`,
+        output: `LGU_PROFILE_${normalizedProfileData.basicInfo.name || 'PANGLAO'}.pdf`,
       });
       toast.dismiss(loadingToast);
       toast.success("PDF DOWNLOADED!");
@@ -60,17 +106,16 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
         className="max-w-5xl w-full mx-auto p-8 space-y-10 grow my-10 rounded-2xl "
       >
         <TitleCard />
-        <BasicInfo data={profileData.basicInfo} />
-        <Officials data={profileData.officials} />
-        <TourismAssets data={profileData.tourismAssets} /> 
-        <Transportation data={profileData.transportation} />
-        <InstitutionalElements data={profileData} />
-        {/* SAFETY COMPONENT ADDED TO THE BOTTOM OF THE LIST */}
-        <Safety data={profileData} />
+        <BasicInfo data={normalizedProfileData.basicInfo} />
+        <Officials data={normalizedProfileData.officials} />
+        <TourismAssets data={normalizedProfileData.tourismAssets} /> 
+        <Transportation data={normalizedProfileData.transportation} />
+        <InstitutionalElements data={normalizedProfileData} />
+        <Safety data={normalizedProfileData} />
       </main>
 
       <footer className="py-10 bg-[#1e293b] text-center text-white text-[11px] font-black tracking-widest">
-        © {new Date().getFullYear()} Municipality of Panglao - Office of the Municipal Tourism Officer {profileData.basicInfo.name || 'PANGLAO'}
+        © {new Date().getFullYear()} Municipality of Panglao - Office of the Municipal Tourism Officer {normalizedProfileData.basicInfo.name || 'PANGLAO'}
         <div className="text-gray-500"> Republic of the Philippines | Province of Bohol</div>
       </footer>
     </div>

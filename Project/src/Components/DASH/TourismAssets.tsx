@@ -2,7 +2,9 @@ import { EmptyRow } from './Common';
 import TourismAsst from './TourismAsst';
 
 export default function TourismAssets({ data }: { data: any }) {
-  const attractions = data?.attractions || [];
+  // Gracefully handles flat profile structures or inner tourismAssets properties
+  const assetsSource = data?.tourismAssets || data || {};
+  const attractions = assetsSource?.attractions || [];
 
   return (
     <section className="space-y-10">
@@ -50,9 +52,10 @@ export default function TourismAssets({ data }: { data: any }) {
           B. Local Tourism Map
         </h3>
         <div className="flex justify-center items-center bg-white/10 rounded-xl min-h-100 border border-dashed border-white/30 backdrop-blur-md transition-all">
-          {data?.tourismMap ? (
+          {/* Fallback to tourism_map property to avoid broken images on strict PostgreSQL tables */}
+          {assetsSource?.tourismMap || assetsSource?.tourism_map ? (
             <img 
-              src={data.tourismMap} 
+              src={assetsSource.tourismMap || assetsSource.tourism_map} 
               alt="Map" 
               className="max-w-full h-auto object-contain shadow-2xl rounded-lg p-2" 
             />
@@ -64,8 +67,7 @@ export default function TourismAssets({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* Assuming TourismAsst also needs the same condition, 
-          you should apply these classes inside that component as well */}
+      {/* ✅ FIXED: Changed normalizedData back to data to match component scope */}
       <TourismAsst data={data} />
     </section>
   );

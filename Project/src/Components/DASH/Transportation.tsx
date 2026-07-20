@@ -3,9 +3,16 @@ export default function Transportation({ data }: { data: any }) {
   const baseCategories = ['JEEPNEY', 'BUS', 'VAN', 'AIRPLANE', 'BOAT', 'TRICYCLE', 'HABAL-HABAL'];
 
   // 2. Extract all unique types from the data to include custom ones added via Admin Panel
+  // Safely parses from multiple database schema structures (data.list, data.transportation.list, etc.)
   const dataArray = Array.isArray(data) 
     ? data 
-    : (data && Array.isArray(data.list) ? data.list : []);
+    : Array.isArray(data?.list)
+    ? data.list
+    : Array.isArray(data?.transportation?.list)
+    ? data.transportation.list
+    : Array.isArray(data?.transportation)
+    ? data.transportation
+    : [];
   
   // Identify types in data that are not in the base list
   const customTypes = dataArray

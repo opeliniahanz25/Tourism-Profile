@@ -31,7 +31,6 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
       }
 
       try {
-        // FIXED: Switched to relative path for all-in-one deployment
         const response = await fetch(`/api/get-lgu-data/${userId}`);
         if (response.ok) {
           const dbData = await response.json();
@@ -45,9 +44,9 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
               region: dbData.basicInfo?.region || "",
               landArea: dbData.basicInfo?.land_area || "", 
               barangays: dbData.basicInfo?.barangays || "",
-              population: dbData.basicInfo?.population || "",
+              population: dbData.basicInfo?.population || "", // ✅ Unified key binding
               languages: dbData.basicInfo?.languages || "",
-              religions: dbData.basicInfo?.religion || "", 
+              religions: dbData.basicInfo?.religion || dbData.basicInfo?.religions || "", // ✅ Graceful fallback
               economicActivities: dbData.basicInfo?.economic_activities || "" 
             },
             officials: {
@@ -65,15 +64,19 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
               attractions: dbData.tourismAssets?.attractions || [],
               accommodations: dbData.tourismAssets?.accommodations || [],
               facilities: dbData.tourismAssets?.facilities || [],
-              // --- IMAGE PERSISTENCE FIX ---
               tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
             },
             transportation: {
               ...prev.transportation,
               list: Array.isArray(dbData.transportation?.list) ? dbData.transportation.list : []
             },
+            // ✅ Read direct structural elements from database tables cleanly
             institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
-                ? dbData.institutional 
+                ? {
+                    ...dbData.institutional,
+                    labor_force: dbData.institutional.labor_force || dbData.institutional.laborForce || {},
+                    revenue_data: dbData.institutional.revenue_data || dbData.institutional.revenueData || {}
+                  } 
                 : prev.institutional,
             crimeIncidents: dbData.crimeIncidents || prev.crimeIncidents || {},
             hazardMatrix: dbData.hazardMatrix || prev.hazardMatrix || {}
@@ -96,7 +99,6 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
     const toastId = toast.loading("SAVING ALL CHANGES...");
     const data = editData as any;
 
-    // FIXED: Switched all endpoints below to relative paths for all-in-one deployment
     const saveOperations = [
       fetch(`/api/save-basic-info`, {
         method: 'POST',
@@ -108,9 +110,9 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
           region: data.basicInfo.region,
           land_area: data.basicInfo.landArea,
           barangays: data.basicInfo.barangays,
-          population: data.basicInfo.population,
+          population: data.basicInfo.population, // ✅ Passes matching fixed key
           languages: data.basicInfo.languages,
-          religion: data.basicInfo.religions,
+          religion: data.basicInfo.religions || data.basicInfo.religion, // ✅ Fixed mapping mismatch
           economic_activities: data.basicInfo.economicActivities 
         }),
       }),
@@ -159,7 +161,11 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          data: data.institutional 
+          data: {
+            ...data.institutional,
+            labor_force: data.institutional?.labor_force || data.institutional?.laborForce, // ✅ Snake case alignment
+            revenue_data: data.institutional?.revenue_data || data.institutional?.revenueData // ✅ Snake case alignment
+          }
         }),
       }),
       fetch(`/api/save-safety`, {

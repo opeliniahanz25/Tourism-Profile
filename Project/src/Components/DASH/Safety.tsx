@@ -2,7 +2,10 @@ import { ShieldAlert, AlertTriangle } from "lucide-react";
 
 export default function Safety({ data }: { data: any }) {
   // Logic: Check if data is flat (data.crimeIncidents) or nested (data.institutional.crimeIncidents)
-  const source = data?.crimeIncidents || data?.hazardMatrix ? data : (data?.institutional || {});
+  // Updated to include full fallback parameters for snake_case objects coming down from the wrapper
+  const source = data?.crimeIncidents || data?.crime_incidents || data?.hazardMatrix || data?.hazard_matrix
+    ? data 
+    : (data?.institutional || {});
 
   const defaultCrimes = [
     "KIDNAPPING",
@@ -20,12 +23,16 @@ export default function Safety({ data }: { data: any }) {
     "TSUNAMI",
   ];
 
+  // Extract objects safely supporting database schemas
+  const coreCrimes = source?.crimeIncidents || source?.crime_incidents || {};
+  const coreHazards = source?.hazardMatrix || source?.hazard_matrix || {};
+
   // Merge default categories with any dynamic keys found in the database
   const crimeCats = Array.from(
-    new Set([...defaultCrimes, ...Object.keys(source?.crimeIncidents || {})])
+    new Set([...defaultCrimes, ...Object.keys(coreCrimes)])
   );
   const hazardCats = Array.from(
-    new Set([...defaultHazards, ...Object.keys(source?.hazardMatrix || {})])
+    new Set([...defaultHazards, ...Object.keys(coreHazards)])
   );
 
   return (
@@ -43,9 +50,9 @@ export default function Safety({ data }: { data: any }) {
                   {c}
                 </td>
                 <td className="p-4 align-top whitespace-pre-wrap wrap-break-words uppercase font-black drop-shadow-sm">
-                  {source?.crimeIncidents?.[c] ||
-                    source?.crimeIncidents?.[c.toUpperCase()] ||
-                    source?.crimeIncidents?.[c.toLowerCase()] ||
+                  {coreCrimes[c] ||
+                    coreCrimes[c.toUpperCase()] ||
+                    coreCrimes[c.toLowerCase()] ||
                     "0"}
                 </td>
               </tr>
@@ -71,9 +78,9 @@ export default function Safety({ data }: { data: any }) {
           <tbody className="text-gray-900">
             {hazardCats.map((h) => {
               const hData =
-                source?.hazardMatrix?.[h] ||
-                source?.hazardMatrix?.[h.toUpperCase()] ||
-                source?.hazardMatrix?.[h.toLowerCase()];
+                coreHazards[h] ||
+                coreHazards[h.toUpperCase()] ||
+                coreHazards[h.toLowerCase()];
 
               return (
                 <tr key={h} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
@@ -84,7 +91,8 @@ export default function Safety({ data }: { data: any }) {
                     {hData?.location || "-"}
                   </td>
                   <td className="p-4 border-r border-white/10 text-center align-top whitespace-pre-wrap wrap-break-words uppercase font-black drop-shadow-sm">
-                    {hData?.attractionLocation || "-"}
+                    {/* ✅ FIXED: Fallback check added to read attraction_location alongside attractionLocation fields */}
+                    {hData?.attractionLocation || hData?.attraction_location || "-"}
                   </td>
                   <td className="p-4 text-center align-top whitespace-pre-wrap wrap-break-words uppercase font-black drop-shadow-sm">
                     {hData?.population || "-"}

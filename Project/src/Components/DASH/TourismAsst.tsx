@@ -1,8 +1,13 @@
 import { EmptyRow } from './Common';
 
 export default function TourismAsst({ data }: { data: any }) {
-  const accommodations = data?.accommodations || [];
-  const facilities = data?.facilities || []; 
+  // Gracefully handle either the top-level profile data object or the isolated tourismAssets slice
+  const targetSource = data?.tourismAssets || data || {};
+  
+  const accommodations = targetSource?.accommodations || [];
+  
+  // ✅ FIXED: Support fallback to accommodation_profile to handle strict PostgreSQL table schemas cleanly
+  const facilities = targetSource?.facilities || targetSource?.accommodation_profile || []; 
 
   return (
     <div className="space-y-10">

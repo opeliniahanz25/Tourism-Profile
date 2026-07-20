@@ -4,7 +4,8 @@ import TabInstitutionalSupport from "./TabInstitutionalSupport";
 export default function TabInstitutional({ editData, setEditData }: { editData: any, setEditData: any }) {
   
   const instData = editData.institutional || {};
-  const revenueYears: string[] = instData.revenueYears || ['y1', 'y2', 'y3'];
+  // ✅ FIXED: Support both database variants (revenueYears and revenue_years) cleanly on initial mapping
+  const revenueYears: string[] = instData.revenueYears || instData.revenue_years || ['y1', 'y2', 'y3'];
 
   const updateNestedData = (section: string, category: string, field: string, value: string) => {
     setEditData({
@@ -51,22 +52,29 @@ export default function TabInstitutional({ editData, setEditData }: { editData: 
     const nextYearKey = `y${revenueYears.length + 1}`;
     setEditData({ 
       ...editData, 
-      institutional: { ...instData, revenueYears: [...revenueYears, nextYearKey] } 
+      institutional: { 
+        ...instData, 
+        revenueYears: [...revenueYears, nextYearKey],
+        revenue_years: [...revenueYears, nextYearKey]
+      } 
     });
   };
 
   const removeRevenueYear = () => {
     if (revenueYears.length <= 1) return;
+    const trimmedYears = revenueYears.slice(0, -1);
     setEditData({ 
       ...editData, 
-      institutional: { ...instData, revenueYears: revenueYears.slice(0, -1) } 
+      institutional: { 
+        ...instData, 
+        revenueYears: trimmedYears,
+        revenue_years: trimmedYears
+      } 
     });
   };
 
   const laborCategories = ['Accommodation', 'Travel Agency', 'Sea Transportation', 'Land Transportation', 'Air Transportation', 'Bars and Restaurants', 'Health and Wellness Centers'];
   const revenueCategories = [...laborCategories, 'MICE'];
-
-
 
   return (
     <div className="space-y-12 animate-in fade-in duration-300 uppercase font-black">
@@ -98,8 +106,15 @@ export default function TabInstitutional({ editData, setEditData }: { editData: 
             <div key={cat} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-[9px] block mb-2 text-gray-500">{cat}</span>
               <div className="grid grid-cols-2 gap-2">
-                <input className="p-2 text-[10px] border rounded bg-white font-black" placeholder="MALE" value={instData.laborForce?.[cat]?.male || ""} onChange={(e) => updateNestedData('laborForce', cat, 'male', e.target.value)} />
-                <input className="p-2 text-[10px] border rounded bg-white font-black" placeholder="FEMALE" value={instData.laborForce?.[cat]?.female || ""} onChange={(e) => updateNestedData('laborForce', cat, 'female', e.target.value)} />
+                {/* ✅ FIXED: Synchronized writing and reading for both labor_force and laborForce to ensure DB tracking safety */}
+                <input className="p-2 text-[10px] border rounded bg-white font-black" placeholder="MALE" value={instData.labor_force?.[cat]?.male || instData.laborForce?.[cat]?.male || ""} onChange={(e) => {
+                  updateNestedData('labor_force', cat, 'male', e.target.value);
+                  updateNestedData('laborForce', cat, 'male', e.target.value);
+                }} />
+                <input className="p-2 text-[10px] border rounded bg-white font-black" placeholder="FEMALE" value={instData.labor_force?.[cat]?.female || instData.laborForce?.[cat]?.female || ""} onChange={(e) => {
+                  updateNestedData('labor_force', cat, 'female', e.target.value);
+                  updateNestedData('laborForce', cat, 'female', e.target.value);
+                }} />
               </div>
             </div>
           ))}
@@ -124,7 +139,11 @@ export default function TabInstitutional({ editData, setEditData }: { editData: 
               <span className="text-[9px] block mb-2 text-gray-600">{cat}</span>
               <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${revenueYears.length}, minmax(0, 1fr))` }}>
                 {revenueYears.map((yearKey: string, idx: number) => (
-                  <input key={yearKey} className="p-2 text-[10px] border rounded bg-gray-50 font-black" placeholder={`YEAR ${idx + 1}`} value={instData.revenueData?.[cat]?.[yearKey] || ""} onChange={(e) => updateNestedData('revenueData', cat, yearKey, e.target.value)} />
+                  /* ✅ FIXED: Synchronized operations across both revenue_data and revenueData properties explicitly */
+                  <input key={yearKey} className="p-2 text-[10px] border rounded bg-gray-50 font-black" placeholder={`YEAR ${idx + 1}`} value={instData.revenue_data?.[cat]?.[yearKey] || instData.revenueData?.[cat]?.[yearKey] || ""} onChange={(e) => {
+                    updateNestedData('revenue_data', cat, yearKey, e.target.value);
+                    updateNestedData('revenueData', cat, yearKey, e.target.value);
+                  }} />
                 ))}
               </div>
             </div>

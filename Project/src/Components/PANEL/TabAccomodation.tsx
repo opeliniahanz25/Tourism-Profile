@@ -6,7 +6,9 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
   // Helper to target the correct folder in your state
   const currentAssets = editData.tourismAssets || {};
   const accommodations = currentAssets.accommodations || [];
-  const facilities = currentAssets.facilities || [];
+  
+  // SUPPORT BOTH SCHEMA NAMING VARIANTS GRACEFULLY ON MOUNT
+  const facilities = currentAssets.facilities || currentAssets.accommodation_profile || [];
   const containerRef = useRef<HTMLDivElement>(null);
 
   // --- AUTO RESIZE LOGIC FOR REFRESH/LOAD ---
@@ -53,7 +55,11 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
     newList[index] = { ...newList[index], [field]: value.toUpperCase() };
     setEditData({ 
       ...editData, 
-      tourismAssets: { ...currentAssets, facilities: newList } 
+      tourismAssets: { 
+        ...currentAssets, 
+        facilities: newList,
+        accommodation_profile: newList // Keep both keys synchronized in state
+      } 
     });
   };
 
@@ -61,7 +67,11 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
     const newList = [...facilities, { name: "", type: "", rooms: "", rate: "", occupancy: "" }];
     setEditData({ 
       ...editData, 
-      tourismAssets: { ...currentAssets, facilities: newList } 
+      tourismAssets: { 
+        ...currentAssets, 
+        facilities: newList,
+        accommodation_profile: newList // Keep both keys synchronized in state
+      } 
     });
   };
 
@@ -70,7 +80,11 @@ export default function TabAccomodation({ editData, setEditData }: { editData: a
     newList.splice(index, 1);
     setEditData({ 
       ...editData, 
-      tourismAssets: { ...currentAssets, facilities: newList } 
+      tourismAssets: { 
+        ...currentAssets, 
+        facilities: newList,
+        accommodation_profile: newList // Keep both keys synchronized in state
+      } 
     });
   };
 
