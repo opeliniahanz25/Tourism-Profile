@@ -17,7 +17,8 @@ export default function DashboardDataWrapper() {
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/api/get-lgu-data/${userId}`);
+        // Changed from hardcoded http://localhost:3000 to relative route for production compatibility
+        const response = await fetch(`/api/get-lgu-data/${userId}`);
         
         if (response.ok) {
           const dbData = await response.json();

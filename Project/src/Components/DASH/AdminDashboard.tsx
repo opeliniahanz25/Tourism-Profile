@@ -9,9 +9,8 @@ import Officials from './Officials';
 import TourismAssets from './TourismAssets';
 import Transportation from './Transportation';
 import InstitutionalElements from './InstitutionalElements';
-import Safety from './Safety'; // IMPORTED HERE
+import Safety from './Safety';
 
-import backgroundImage from '../../../public/assets/Background.jpg';
 import { type ProfileData } from '../../data/profileData';
 
 interface AdminDashboardProps {
@@ -33,7 +32,7 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
           useCORS: true, 
           backgroundColor: '#ffffff' 
         },
-        output: `LGU_PROFILE_${profileData.basicInfo.name || 'PANGLAO'}.pdf`,
+        output: `LGU_PROFILE_${profileData?.basicInfo?.name || 'PANGLAO'}.pdf`,
       });
       toast.dismiss(loadingToast);
       toast.success("PDF DOWNLOADED!");
@@ -47,7 +46,7 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
     <div 
       className="min-h-screen flex flex-col font-sans uppercase" 
       style={{ 
-        backgroundImage: `url(${backgroundImage})`, 
+        backgroundImage: `url('/assets/Background.jpg')`, 
         backgroundSize: 'cover', 
         backgroundAttachment: 'fixed' 
       }}
@@ -57,20 +56,19 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
 
       <main 
         ref={mainContentRef} 
-        className="max-w-5xl w-full mx-auto p-8 space-y-10 grow my-10 rounded-2xl "
+        className="max-w-5xl w-full mx-auto p-8 space-y-10 grow my-10 rounded-2xl bg-white/90 shadow-xl"
       >
         <TitleCard />
-        <BasicInfo data={profileData.basicInfo} />
-        <Officials data={profileData.officials} />
-        <TourismAssets data={profileData.tourismAssets} /> 
-        <Transportation data={profileData.transportation} />
+        <BasicInfo data={profileData?.basicInfo} />
+        <Officials data={profileData?.officials} />
+        <TourismAssets data={profileData?.tourismAssets} /> 
+        <Transportation data={profileData?.transportation} />
         <InstitutionalElements data={profileData} />
-        {/* SAFETY COMPONENT ADDED TO THE BOTTOM OF THE LIST */}
         <Safety data={profileData} />
       </main>
 
       <footer className="py-10 bg-[#1e293b] text-center text-white text-[11px] font-black tracking-widest">
-        © {new Date().getFullYear()} Municipality of Panglao - Office of the Municipal Tourism Officer {profileData.basicInfo.name || 'PANGLAO'}
+        © {new Date().getFullYear()} Municipality of Panglao - Office of the Municipal Tourism Officer {profileData?.basicInfo?.name || 'PANGLAO'}
         <div className="text-gray-500"> Republic of the Philippines | Province of Bohol</div>
       </footer>
     </div>
