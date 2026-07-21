@@ -8,88 +8,95 @@ export default function DashboardDataWrapper() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
+  // --- EXACT FETCH METHOD FROM ADMIN PANEL ---
   const loadFromDatabase = useCallback(async () => {
+    setLoading(true);
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-    const userId = storedUser?.id;
-
+    const userId = storedUser.id;
     if (!userId) {
-      console.warn("⚠️ No User ID found in localStorage");
       setLoading(false);
       return;
     }
 
     try {
-      // 🚨 CRITICAL FIX: Relative URL (/api/...) instead of http://localhost:3000/api/...
       const response = await fetch(`/api/get-lgu-data/${userId}`);
-
       if (response.ok) {
         const dbData = await response.json();
-
-        const b = dbData.basicInfo || {};
-        const o = dbData.officials || {};
-        const t = dbData.tourismAssets || {};
-        const tr = dbData.transportation || {};
-        const inst = dbData.institutional || {};
-
-        setProfileData({
+        
+        // Exact state mapping logic mirrored from AdminPanel
+        setProfileData((prev: any) => ({
+          ...prev,
           basicInfo: {
-            name: b.name || initialProfileData.basicInfo.name,
-            province: b.province || initialProfileData.basicInfo.province,
-            region: b.region || initialProfileData.basicInfo.region,
-            population: b.population || "",
-            landArea: b.landArea || b.land_area || "",
-            barangays: b.barangays || "",
-            religions: b.religions || b.religion || "",
-            languages: b.languages || "",
-            economicActivities: b.economicActivities || b.economic_activities || ""
+            ...prev.basicInfo,
+            name: dbData.basicInfo?.name || "",
+            province: dbData.basicInfo?.province || "",
+            region: dbData.basicInfo?.region || "",
+            landArea: dbData.basicInfo?.landArea || dbData.basicInfo?.land_area || "", 
+            barangays: dbData.basicInfo?.barangays || "",
+            population: dbData.basicInfo?.population || "",
+            languages: dbData.basicInfo?.languages || "",
+            religions: dbData.basicInfo?.religions || dbData.basicInfo?.religion || "", 
+            economicActivities: dbData.basicInfo?.economicActivities || dbData.basicInfo?.economic_activities || "" 
           },
           officials: {
-            mayor: o.mayor || "",
-            viceMayor: o.viceMayor || o.vice_mayor || "",
-            tourismOfficer: o.tourismOfficer || o.tourism_officer || "",
-            planningCoordinator: o.planningCoordinator || o.planning_coordinator || "",
-            skFederationPresident: o.skFederationPresident || o.sk_federation_president || "",
-            council: Array.isArray(o.council) ? o.council : initialProfileData.officials.council,
-            skMembers: Array.isArray(o.skMembers) ? o.skMembers : (Array.isArray(o.sk_members) ? o.sk_members : [])
+            ...prev.officials,
+            mayor: dbData.officials?.mayor || "",
+            viceMayor: dbData.officials?.viceMayor || dbData.officials?.vice_mayor || "", 
+            tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
+            planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
+            skFederationPresident: dbData.officials?.skFederationPresident || dbData.officials?.sk_federation_president || "",
+            council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : Array(10).fill(""),
+            skMembers: Array.isArray(dbData.officials?.skMembers) 
+              ? dbData.officials.skMembers 
+              : Array.isArray(dbData.officials?.sk_members) 
+              ? dbData.officials.sk_members 
+              : []
           },
           tourismAssets: {
-            attractions: Array.isArray(t.attractions) ? t.attractions : [],
-            accommodations: Array.isArray(t.accommodations) ? t.accommodations : [],
-            facilities: Array.isArray(t.facilities) ? t.facilities : (Array.isArray(t.accommodation_profile) ? t.accommodation_profile : []),
-            tourismMap: t.tourismMap || t.tourism_map || ""
+            ...prev.tourismAssets,
+            attractions: dbData.tourismAssets?.attractions || [],
+            accommodations: dbData.tourismAssets?.accommodations || [],
+            facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
+            tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
           },
           transportation: {
-            list: Array.isArray(tr.list) ? tr.list : (Array.isArray(tr) ? tr : [])
+            ...prev.transportation,
+            list: Array.isArray(dbData.transportation?.list) 
+              ? dbData.transportation.list 
+              : Array.isArray(dbData.transportation) 
+              ? dbData.transportation 
+              : []
           },
           institutional: {
-            institutionalFacilities: inst.institutionalFacilities || inst.facilities || [],
-            laborForce: inst.laborForce || inst.labor_force || {},
-            revenueData: inst.revenueData || inst.revenue_data || {},
-            revenueYears: inst.revenueYears || ['y1', 'y2', 'y3']
+            laborForce: dbData.institutional?.laborForce || dbData.institutional?.labor_force || prev.institutional?.laborForce || {},
+            revenueData: dbData.institutional?.revenueData || dbData.institutional?.revenue_data || prev.institutional?.revenueData || {},
+            emergencyContacts: dbData.institutional?.emergencyContacts || dbData.institutional?.emergency_contacts || prev.institutional?.emergencyContacts || [],
+            tourismEducation: dbData.institutional?.tourismEducation || dbData.institutional?.tourism_education || prev.institutional?.tourismEducation || [],
+            tourismProjects: dbData.institutional?.tourismProjects || dbData.institutional?.tourism_projects || prev.institutional?.tourismProjects || [],
+            institutionalFacilities: dbData.institutional?.institutionalFacilities || dbData.institutional?.facilities || prev.institutional?.institutionalFacilities || []
           },
-          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || inst.crimeIncidents || inst.crime_incidents || {},
-          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || inst.hazardMatrix || inst.hazard_matrix || {}
-        });
+          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || dbData.institutional?.crime_incidents || prev.crimeIncidents || {},
+          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || dbData.institutional?.hazard_matrix || prev.hazardMatrix || {}
+        }));
       }
     } catch (error) {
-      console.error("❌ Dashboard Fetch Error:", error);
+      console.error("Fetch Error:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Sync on mount, page route change, tab focus, or custom save event
   useEffect(() => {
     loadFromDatabase();
 
-    const handleFocus = () => loadFromDatabase();
-    const handleDbUpdate = () => loadFromDatabase();
-
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('db_data_updated', handleDbUpdate);
+    const handleSync = () => loadFromDatabase();
+    window.addEventListener('focus', handleSync);
+    window.addEventListener('db_data_updated', handleSync);
 
     return () => {
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('db_data_updated', handleDbUpdate);
+      window.removeEventListener('focus', handleSync);
+      window.removeEventListener('db_data_updated', handleSync);
     };
   }, [location.pathname, loadFromDatabase]);
 
