@@ -6,7 +6,7 @@ import { initialProfileData, type ProfileData } from '../../data/profileData';
 export default function DashboardDataWrapper() {
   const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
   const [loading, setLoading] = useState(true);
-  const location = useLocation(); // Triggers re-fetch on route change!
+  const location = useLocation();
 
   const loadFromDatabase = useCallback(async () => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -19,7 +19,6 @@ export default function DashboardDataWrapper() {
     }
 
     try {
-      // Relative API path works both locally and on Render production
       const response = await fetch(`/api/get-lgu-data/${userId}`);
 
       if (response.ok) {
@@ -98,7 +97,6 @@ export default function DashboardDataWrapper() {
     }
   }, []);
 
-  // Re-fetch whenever location (path) changes, tab gains focus, or db_data_updated event fires
   useEffect(() => {
     loadFromDatabase();
 

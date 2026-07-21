@@ -36,18 +36,63 @@ export const LGUController = {
     try {
       const [basicInfo, officials, tourism, transport, institutional, safety] = await LGUModel.getAllData(userId);
       
-      const mergedInstitutional = {
-        ...(institutional.rows[0]?.data || {}),
-        crimeIncidents: safety.rows[0]?.crime_incidents || {},
-        hazardMatrix: safety.rows[0]?.hazard_matrix || {}
-      };
+      const rawBasic = basicInfo.rows[0] || {};
+      const rawOfficials = officials.rows[0] || {};
+      const rawTourism = tourism.rows[0] || {};
+      const rawTransport = transport.rows[0] || {};
+      const rawInst = institutional.rows[0]?.data || {};
+      const rawSafety = safety.rows[0] || {};
 
+      // Normalize snake_case keys into camelCase for front-end rendering
       res.json({
-        basicInfo: basicInfo.rows[0] || {},
-        officials: officials.rows[0] || {},
-        tourismAssets: tourism.rows[0] || {},
-        transportation: { list: transport.rows[0]?.list || [] },
-        institutional: mergedInstitutional 
+        basicInfo: {
+          name: rawBasic.name || "",
+          province: rawBasic.province || "",
+          region: rawBasic.region || "",
+          landArea: rawBasic.land_area || rawBasic.landArea || "",
+          land_area: rawBasic.land_area || rawBasic.landArea || "",
+          barangays: rawBasic.barangays || "",
+          population: rawBasic.population || "",
+          languages: rawBasic.languages || "",
+          religions: rawBasic.religion || rawBasic.religions || "",
+          religion: rawBasic.religion || rawBasic.religions || "",
+          economicActivities: rawBasic.economic_activities || rawBasic.economicActivities || "",
+          economic_activities: rawBasic.economic_activities || rawBasic.economicActivities || ""
+        },
+        officials: {
+          mayor: rawOfficials.mayor || "",
+          viceMayor: rawOfficials.vice_mayor || rawOfficials.viceMayor || "",
+          vice_mayor: rawOfficials.vice_mayor || rawOfficials.viceMayor || "",
+          tourismOfficer: rawOfficials.tourism_officer || rawOfficials.tourismOfficer || "",
+          tourism_officer: rawOfficials.tourism_officer || rawOfficials.tourismOfficer || "",
+          planningCoordinator: rawOfficials.planning_coordinator || rawOfficials.planningCoordinator || "",
+          planning_coordinator: rawOfficials.planning_coordinator || rawOfficials.planningCoordinator || "",
+          skFederationPresident: rawOfficials.sk_federation_president || rawOfficials.skFederationPresident || "",
+          sk_federation_president: rawOfficials.sk_federation_president || rawOfficials.skFederationPresident || "",
+          council: rawOfficials.council || [],
+          skMembers: rawOfficials.sk_members || rawOfficials.skMembers || [],
+          sk_members: rawOfficials.sk_members || rawOfficials.skMembers || []
+        },
+        tourismAssets: {
+          attractions: rawTourism.attractions || [],
+          accommodations: rawTourism.accommodations || [],
+          facilities: rawTourism.facilities || [],
+          tourismMap: rawTourism.tourism_map || rawTourism.tourismMap || "",
+          tourism_map: rawTourism.tourism_map || rawTourism.tourismMap || ""
+        },
+        transportation: { 
+          list: rawTransport.list || [] 
+        },
+        institutional: {
+          ...rawInst,
+          laborForce: rawInst.laborForce || rawInst.labor_force || {},
+          revenueData: rawInst.revenueData || rawInst.revenue_data || {},
+          emergencyContacts: rawInst.emergencyContacts || rawInst.emergency_contacts || [],
+          tourismEducation: rawInst.tourismEducation || rawInst.tourism_education || [],
+          tourismProjects: rawInst.tourismProjects || rawInst.tourism_projects || []
+        },
+        crimeIncidents: rawSafety.crime_incidents || rawSafety.crimeIncidents || rawInst.crimeIncidents || {},
+        hazardMatrix: rawSafety.hazard_matrix || rawSafety.hazardMatrix || rawInst.hazardMatrix || {}
       });
     } catch (err) {
       console.error("❌ GET DATA ERROR:", err.message);
