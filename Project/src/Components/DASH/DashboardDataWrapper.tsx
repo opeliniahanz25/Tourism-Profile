@@ -3,6 +3,19 @@ import { useLocation } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
 import { initialProfileData, type ProfileData } from '../../data/profileData';
 
+const parseArray = (input: any): any[] => {
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string' && input.trim() !== '') {
+    try {
+      const parsed = JSON.parse(input);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export default function DashboardDataWrapper() {
   const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
   const [loading, setLoading] = useState(true);
@@ -13,29 +26,17 @@ export default function DashboardDataWrapper() {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = storedUser?.id;
 
-    console.log("🔍 Checking localStorage user ID:", userId);
-
     if (!userId) {
-      console.warn("⚠️ No User ID found in localStorage! Please Log out and Log back in.");
+      console.warn("⚠️ No User ID found in localStorage!");
       setLoading(false);
       return;
     }
 
     try {
       const response = await fetch(`/api/get-lgu-data/${userId}`);
-      console.log("📡 Fetching LGU data response status:", response.status);
 
       if (response.ok) {
         const dbData = await response.json();
-        console.log("📥 Raw PostgreSQL Data Received:", dbData);
-
-        const parseArray = (w: any) => {
-          if (Array.isArray(w)) return w;
-          if (typeof w === "string" && w.trim() !== "") {
-            try { return JSON.parse(w); } catch { return []; }
-          }
-          return [];
-        };
 
         setProfileData((prev: any) => ({
           ...prev,
@@ -70,11 +71,7 @@ export default function DashboardDataWrapper() {
           },
           transportation: {
             ...prev.transportation,
-            list: Array.isArray(dbData.transportation?.list) 
-              ? dbData.transportation.list 
-              : Array.isArray(dbData.transportation) 
-              ? dbData.transportation 
-              : []
+            list: parseArray(dbData.transportation?.list || dbData.transportation)
           },
           institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
             ? dbData.institutional 
@@ -82,11 +79,9 @@ export default function DashboardDataWrapper() {
           crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || prev.crimeIncidents || {},
           hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || prev.hazardMatrix || {}
         }));
-      } else {
-        console.error("❌ API returned error status:", response.status);
       }
     } catch (error) {
-      console.error("❌ Fetch Error in DashboardDataWrapper:", error);
+      console.error("❌ Dashboard Fetch Error:", error);
     } finally {
       setLoading(false);
     }

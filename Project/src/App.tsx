@@ -7,18 +7,19 @@ import SignUp from './Components/SignUp';
 import './index.css';
 
 // --- ROUTE GUARD ---
-// Checks if a user session exists in localStorage
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = localStorage.getItem('user');
   return user ? <>{children}</> : <Navigate to="/" replace />;
 };
 
 export default function App() {
-  // --- THE BRIDGE ---
-  // Triggers custom event to notify DashboardDataWrapper to re-fetch from PostgreSQL
+  // Force a fresh console log to verify new bundle build
+  React.useEffect(() => {
+    console.log("🚀 LATEST FRONTEND BUILD LOADED SUCCESSFULLY!");
+  }, []);
+
   const handleSave = () => {
     window.dispatchEvent(new Event("db_data_updated"));
-    console.log("✅ TRIGGERED RE-FETCH FROM POSTGRESQL");
   };
 
   return (
@@ -33,7 +34,6 @@ export default function App() {
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              {/* DashboardDataWrapper handles the DB Fetching automatically */}
               <DashboardDataWrapper />
             </ProtectedRoute>
           } 

@@ -4,7 +4,6 @@ import { Info, Users, MapPin, Building2, Bus, School, ShieldAlert, Loader2 } fro
 import { Toaster, toast } from "sonner";
 import { initialProfileData, type ProfileData } from '../../data/profileData';
 
-// Tab Components
 import TabBasicInfo from './TabBasicInfo';
 import TabOfficials from './TabOfficials';
 import TabAttractions from './TabAttractions'; 
@@ -13,18 +12,31 @@ import TabTransport from './TabTransport';
 import TabInstitutional from './TabInstitutional';
 import TabSafety from './TabSafety';
 
+const parseArray = (input: any): any[] => {
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string' && input.trim() !== '') {
+    try {
+      const parsed = JSON.parse(input);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export default function AdminPanel({ onSave: propOnSave }: any) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Basic Info");
   const [editData, setEditData] = useState<ProfileData>(initialProfileData);
   const [loading, setLoading] = useState(true);
 
-  // --- 1. LOAD DATA FROM DATABASE ---
   useEffect(() => {
     const loadFromDatabase = async () => {
       setLoading(true);
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = storedUser.id;
+
       if (!userId) {
         console.warn("⚠️ No user ID found in localStorage!");
         setLoading(false);
@@ -35,7 +47,6 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         const response = await fetch(`/api/get-lgu-data/${userId}`);
         if (response.ok) {
           const dbData = await response.json();
-          console.log("📥 AdminPanel Fetched Data:", dbData);
           
           setEditData((prev: any) => ({
             ...prev,
@@ -58,27 +69,19 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
               tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
               planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
               skFederationPresident: dbData.officials?.skFederationPresident || dbData.officials?.sk_federation_president || "",
-              council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : Array(10).fill(""),
-              skMembers: Array.isArray(dbData.officials?.skMembers) 
-                ? dbData.officials.skMembers 
-                : Array.isArray(dbData.officials?.sk_members) 
-                ? dbData.officials.sk_members 
-                : []
+              council: parseArray(dbData.officials?.council).length > 0 ? parseArray(dbData.officials?.council) : Array(10).fill(""),
+              skMembers: parseArray(dbData.officials?.sk_members || dbData.officials?.skMembers)
             },
             tourismAssets: {
               ...prev.tourismAssets,
-              attractions: dbData.tourismAssets?.attractions || [],
-              accommodations: dbData.tourismAssets?.accommodations || [],
-              facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
+              attractions: parseArray(dbData.tourismAssets?.attractions),
+              accommodations: parseArray(dbData.tourismAssets?.accommodations),
+              facilities: parseArray(dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile),
               tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
             },
             transportation: {
               ...prev.transportation,
-              list: Array.isArray(dbData.transportation?.list) 
-                ? dbData.transportation.list 
-                : Array.isArray(dbData.transportation) 
-                ? dbData.transportation 
-                : []
+              list: parseArray(dbData.transportation?.list || dbData.transportation)
             },
             institutional: {
               laborForce: dbData.institutional?.laborForce || dbData.institutional?.labor_force || prev.institutional?.laborForce || {},
@@ -87,8 +90,8 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
               tourismEducation: dbData.institutional?.tourismEducation || dbData.institutional?.tourism_education || prev.institutional?.tourismEducation || [],
               tourismProjects: dbData.institutional?.tourismProjects || dbData.institutional?.tourism_projects || prev.institutional?.tourismProjects || []
             },
-            crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || dbData.institutional?.crime_incidents || prev.crimeIncidents || {},
-            hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || dbData.institutional?.hazard_matrix || prev.hazardMatrix || {}
+            crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || prev.crimeIncidents || {},
+            hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || prev.hazardMatrix || {}
           }));
         }
       } catch (error) {
@@ -100,13 +103,11 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
     loadFromDatabase();
   }, []);
 
-  // --- 2. SAVE ALL DATA TO DATABASE ---
   const handleSave = async () => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = storedUser.id;
     if (!userId) return toast.error("LOGIN REQUIRED - NO USER ID");
 
-    console.log("💾 Starting save process for User ID:", userId);
     const toastId = toast.loading("SAVING ALL CHANGES...");
     const data = editData as any;
 
@@ -195,18 +196,13 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
 
       if (allSuccessful) {
         toast.success("ALL DATA SAVED SUCCESSFULLY!", { id: toastId });
-        console.log("✅ All save operations succeeded!");
-        
-        // Notify any active components to re-fetch from PostgreSQL
         window.dispatchEvent(new Event("db_data_updated"));
-        
         if (propOnSave) propOnSave();
       } else {
-        console.error("❌ Some save operations failed:", results);
         toast.error("SOME SECTIONS FAILED TO SAVE. PLEASE TRY AGAIN.", { id: toastId });
       }
     } catch (err) {
-      console.error("❌ Save Network/Server Error:", err);
+      console.error("❌ Save Error:", err);
       toast.error("DATABASE CONNECTION FAILED!", { id: toastId });
     }
   };
