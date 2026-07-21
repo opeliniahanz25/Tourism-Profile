@@ -3,9 +3,7 @@ import { Plus, Trash2, Image as ImageIcon, Upload, TableProperties, X } from "lu
 
 export default function TabAttractions({ editData, setEditData }: { editData: any, setEditData: any }) {
   
-  // ✅ FIXED: Support both database variants (tourismMap and tourism_map) cleanly right at mapping initialization
-  const currentAssets = editData.tourismAssets || { attractions: [], tourismMap: "", tourism_map: "" };
-  const base64Map = currentAssets.tourismMap || currentAssets.tourism_map || "";
+  const currentAssets = editData.tourismAssets || { attractions: [], tourismMap: "" };
 
   const updateAttraction = (index: number, field: string, value: string) => {
     const newList = [...(currentAssets.attractions || [])];
@@ -54,12 +52,7 @@ export default function TabAttractions({ editData, setEditData }: { editData: an
             
             setEditData({ 
               ...editData, 
-              // ✅ FIXED: Keeps both camelCase and snake_case properties populated to prevent any data drops down the line
-              tourismAssets: { 
-                ...currentAssets, 
-                tourismMap: compressedBase64,
-                tourism_map: compressedBase64
-              } 
+              tourismAssets: { ...currentAssets, tourismMap: compressedBase64 } 
             });
           }
         };
@@ -72,8 +65,7 @@ export default function TabAttractions({ editData, setEditData }: { editData: an
   const removeMap = () => {
     setEditData({ 
       ...editData, 
-      // ✅ FIXED: Clears out both parameters explicitly
-      tourismAssets: { ...currentAssets, tourismMap: "", tourism_map: "" } 
+      tourismAssets: { ...currentAssets, tourismMap: "" } 
     });
   };
 
@@ -113,15 +105,15 @@ export default function TabAttractions({ editData, setEditData }: { editData: an
           <ImageIcon size={18} className="text-cyan-600" /> B. Local Tourism Map
         </h3>
         <label className="cursor-pointer flex items-center gap-3 bg-gray-800 hover:bg-black text-white px-10 py-4 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg mx-auto w-fit">
-          <Upload size={16} /> {base64Map ? "Change Map Image" : "Upload Map Image"}
+          <Upload size={16} /> {currentAssets.tourismMap ? "Change Map Image" : "Upload Map Image"}
           <input type="file" className="hidden" accept="image/*" onChange={handleMapUpload} />
         </label>
 
-        {base64Map && (
+        {currentAssets.tourismMap && (
           <div className="mt-4 flex flex-col items-center">
             <p className="text-[9px] text-green-600 font-bold uppercase mb-2">✓ Image Optimized & Ready</p>
             <div className="relative group inline-block">
-              <img src={base64Map} className="h-48 w-auto rounded border shadow-sm" alt="Preview" />
+              <img src={currentAssets.tourismMap} className="h-48 w-auto rounded border shadow-sm" alt="Preview" />
               <button onClick={removeMap} className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700">
                 <X size={14} strokeWidth={3} />
               </button>

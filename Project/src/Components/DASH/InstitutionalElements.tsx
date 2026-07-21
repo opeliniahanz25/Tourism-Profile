@@ -11,20 +11,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
 
   const laborCats = ['Accommodation', 'Travel Agency', 'Sea Transportation', 'Land Transportation', 'Air Transportation', 'Bars and Restaurants', 'Health and Wellness Centers'];
   const revCats = [...laborCats, 'MICE'];
-  
-  // Safely extract institutional data tree block from root profile properties
-  const instSource = data?.institutional || data || {};
-  const revenueYears: string[] = instSource?.revenueYears || instSource?.revenue_years || ['y1', 'y2', 'y3'];
-
-  // Resolve arrays safely across snake_case and camelCase variants
-  const facilitiesList = instSource?.institutionalFacilities || [];
-  const contactsList = instSource?.emergencyContacts || instSource?.emergency_contacts || [];
-  const educationList = instSource?.tourismEducation || instSource?.tourism_education || [];
-  const projectsList = instSource?.tourismProjects || instSource?.tourism_projects || [];
-
-  // Extract nested objects explicitly
-  const laborForceObject = instSource?.laborForce || instSource?.labor_force || {};
-  const revenueDataObject = instSource?.revenueData || instSource?.revenue_data || {};
+  const revenueYears: string[] = data?.revenueYears || ['y1', 'y2', 'y3'];
 
   return (
     <div className="space-y-12 uppercase font-black">
@@ -48,7 +35,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
             </tr>
           </thead>
           <tbody className="text-gray-900">
-            {facilitiesList.length > 0 ? facilitiesList.map((item: any, i: number) => (
+            {data?.institutionalFacilities?.length > 0 ? data.institutionalFacilities.map((item: any, i: number) => (
               <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{item.group}</td>
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{item.role}</td>
@@ -77,8 +64,8 @@ export default function InstitutionalElements({ data }: { data: any }) {
             {laborCats.map(item => (
               <tr key={item} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
                 <td className="p-4 border-r border-white/10 bg-white/5 align-top drop-shadow-sm">{item}</td>
-                <td className="p-4 border-r border-white/10 text-center text-black align-top drop-shadow-sm">{laborForceObject[item]?.male || "0"}</td>
-                <td className="p-4 text-center text-black align-top drop-shadow-sm">{laborForceObject[item]?.female || "0"}</td>
+                <td className="p-4 border-r border-white/10 text-center text-black align-top drop-shadow-sm">{data?.laborForce?.[item]?.male || "0"}</td>
+                <td className="p-4 text-center text-black align-top drop-shadow-sm">{data?.laborForce?.[item]?.female || "0"}</td>
               </tr>
             ))}
           </tbody>
@@ -106,7 +93,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
                 <td className="p-4 border-r border-white/10 bg-white/5 align-top drop-shadow-sm">{item}</td>
                 {revenueYears.map((yearKey: string) => (
                   <td key={yearKey} className="p-4 border-r border-white/10 last:border-r-0 text-center align-top drop-shadow-sm">
-                    {revenueDataObject[item]?.[yearKey] || "0.00"}
+                    {data?.revenueData?.[item]?.[yearKey] || "0.00"}
                   </td>
                 ))}
               </tr>
@@ -130,7 +117,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
             </tr>
           </thead>
           <tbody className="text-gray-900">
-            {contactsList.length > 0 ? contactsList.map((c: any, i: number) => (
+            {data?.emergencyContacts?.length > 0 ? data.emergencyContacts.map((c: any, i: number) => (
               <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{c.office}</td>
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{c.person}</td>
@@ -159,7 +146,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
             </tr>
           </thead>
           <tbody className="text-gray-900">
-            {educationList.length > 0 ? educationList.map((edu: any, i: number) => (
+            {data?.tourismEducation?.length > 0 ? data.tourismEducation.map((edu: any, i: number) => (
               <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{edu.title}</td>
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{edu.date}</td>
@@ -190,7 +177,7 @@ export default function InstitutionalElements({ data }: { data: any }) {
             </tr>
           </thead>
           <tbody className="text-gray-900">
-            {projectsList.length > 0 ? projectsList.map((p: any, i: number) => (
+            {data?.tourismProjects?.length > 0 ? data.tourismProjects.map((p: any, i: number) => (
               <tr key={i} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{p.name}</td>
                 <td className="p-4 border-r border-white/10 align-top whitespace-pre-wrap wrap-break-words drop-shadow-sm">{p.duration}</td>

@@ -6,7 +6,6 @@ export function useAdminData() {
   const [editData, setEditData] = useState<ProfileData>(initialProfileData);
   const [loading, setLoading] = useState(true);
 
-  // --- 1. LOAD DATA FROM DATABASE ---
   useEffect(() => {
     const loadFromDatabase = async () => {
       setLoading(true);
@@ -19,8 +18,7 @@ export function useAdminData() {
       }
 
       try {
-        // ✅ FIXED: Removed absolute 'http://localhost:3000' domain for relative production requests
-        const response = await fetch(`/api/get-lgu-data/${userId}`);
+        const response = await fetch(`http://localhost:3000/api/get-lgu-data/${userId}`);
         if (response.ok) {
           const dbData = await response.json();
           
@@ -35,15 +33,15 @@ export function useAdminData() {
               barangays: dbData.basicInfo?.barangays || "",
               population: dbData.basicInfo?.population || "",
               languages: dbData.basicInfo?.languages || "",
-              religions: dbData.basicInfo?.religion || dbData.basicInfo?.religions || "", 
+              religions: dbData.basicInfo?.religion || "", 
               economicActivities: dbData.basicInfo?.economic_activities || "" 
             },
             officials: {
               ...prev.officials,
               mayor: dbData.officials?.mayor || "",
-              viceMayor: dbData.officials?.vice_mayor || dbData.officials?.viceMayor || "", 
-              tourismOfficer: dbData.officials?.tourism_officer || dbData.officials?.tourismOfficer || "", 
-              planningCoordinator: dbData.officials?.planning_coordinator || dbData.officials?.planningCoordinator || "",
+              viceMayor: dbData.officials?.vice_mayor || "", 
+              tourismOfficer: dbData.officials?.tourism_officer || "", 
+              planningCoordinator: dbData.officials?.planning_coordinator || "",
               skFederationPresident: dbData.officials?.sk_federation_president || "",
               council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : prev.officials.council,
               skMembers: Array.isArray(dbData.officials?.sk_members) ? dbData.officials.sk_members : []
@@ -52,23 +50,15 @@ export function useAdminData() {
               ...prev.tourismAssets,
               attractions: dbData.tourismAssets?.attractions || [],
               accommodations: dbData.tourismAssets?.accommodations || [],
-              facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
+              // This matches the key sent by our new server GET route
+              facilities: dbData.tourismAssets?.facilities || [],
+              // Fix naming: db uses tourism_map, frontend uses tourismMap
               tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
             },
             transportation: {
               ...prev.transportation,
-              list: dbData.transportation?.list || dbData.transportation || []
-            },
-            // ✅ EXTRA NUANCE: Explicitly map data structures back down onto structural schema layers safely
-            institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
-                ? {
-                    ...dbData.institutional,
-                    labor_force: dbData.institutional.labor_force || dbData.institutional.laborForce || {},
-                    revenue_data: dbData.institutional.revenue_data || dbData.institutional.revenueData || {}
-                  } 
-                : prev.institutional,
-            crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || prev.crimeIncidents || {},
-            hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || prev.hazardMatrix || {}
+              list: dbData.transportation?.list || []
+            }
           }));
         }
       } catch (error) {
@@ -81,7 +71,6 @@ export function useAdminData() {
     loadFromDatabase();
   }, []);
 
-  // --- 2. SAVE ALL DATA TO DATABASE ---
   const handleSave = async (activeTab: string, onSaveSuccess?: () => void) => {
     const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
     if (!userId) return toast.error("LOGIN REQUIRED");
@@ -102,7 +91,7 @@ export function useAdminData() {
           barangays: data.basicInfo.barangays,
           population: data.basicInfo.population,
           languages: data.basicInfo.languages,
-          religion: data.basicInfo.religions || data.basicInfo.religion,
+          religion: data.basicInfo.religions,
           economic_activities: data.basicInfo.economicActivities
         };
       } 
@@ -111,9 +100,9 @@ export function useAdminData() {
         payload = { 
           user_id: userId,
           mayor: data.officials.mayor,
-          vice_mayor: data.officials.viceMayor || data.officials.vice_mayor,
-          tourism_officer: data.officials.tourismOfficer || data.officials.tourism_officer,
-          planning_coordinator: data.officials.planningCoordinator || data.officials.planning_coordinator,
+          vice_mayor: data.officials.viceMayor,
+          tourism_officer: data.officials.tourismOfficer,
+          planning_coordinator: data.officials.planningCoordinator,
           sk_federation_president: data.officials.skFederationPresident || "",
           council: data.officials.council,
           sk_members: data.officials.skMembers || []
@@ -124,43 +113,33 @@ export function useAdminData() {
         payload = { 
           user_id: userId, 
           attractions: data.tourismAssets.attractions, 
-          tourismMap: data.tourismAssets.tourismMap || data.tourismAssets.tourism_map 
+          tourismMap: data.tourismAssets.tourismMap 
         };
       }
       else if (activeTab === "Accommodation") {
-        endpoint = '/api/save-accommodations';
-        payload = { 
-          user_id: userId, 
-          accommodations: data.tourismAssets.accommodations,
-          accommodation_profile: data.tourismAssets.facilities || data.tourismAssets.accommodation_profile 
-        };
-      }
+  endpoint = '/api/save-accommodations';
+  payload = { 
+    user_id: userId, 
+    accommodations: data.tourismAssets.accommodations, // Section C
+    accommodation_profile: data.tourismAssets.facilities // Section D
+  };
+}
       else if (activeTab === "Transport") {
         endpoint = '/api/save-transport';
-        payload = { user_id: userId, list: data.transportation.list || data.transportation };
-      }
-      else if (activeTab === "Institutional") {
-        endpoint = '/api/save-institutional';
-        payload = {
-          user_id: userId,
-          data: {
-            ...data.institutional,
-            labor_force: data.institutional?.labor_force || data.institutional?.laborForce,
-            revenue_data: data.institutional?.revenue_data || data.institutional?.revenueData
-          }
-        };
-      }
-      else if (activeTab === "Safety") {
-        endpoint = '/api/save-safety';
-        payload = { 
-          user_id: userId, 
-          crimeIncidents: data.crimeIncidents || data.crime_incidents, 
-          hazardMatrix: data.hazardMatrix || data.hazard_matrix 
-        };
+        payload = { user_id: userId, list: data.transportation.list };
       }
 
-      // ✅ FIXED: Removed 'http://localhost:3000' absolute path for relative operations tracking
-      const res = await fetch(endpoint, {
+      // Inside useAdminData's handleSave function
+else if (activeTab === "Safety") {
+  endpoint = '/api/save-safety';
+  payload = { 
+    user_id: userId, 
+    crimeIncidents: data.crimeIncidents, 
+    hazardMatrix: data.hazardMatrix 
+  };
+}
+
+      const res = await fetch(`http://localhost:3000${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

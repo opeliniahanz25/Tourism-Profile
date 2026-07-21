@@ -15,7 +15,7 @@ export default function DashboardHeader({ onPrint }: { onPrint?: () => void }) {
   const handleSaveClick = () => {
     if (onPrint) {
       setIsSaving(true);
-      onPrint(); // Calls html2pdf export in the parent AdminDashboard component
+      onPrint(); // Calls window.print() in the parent component
       
       // Feedback duration
       setTimeout(() => {

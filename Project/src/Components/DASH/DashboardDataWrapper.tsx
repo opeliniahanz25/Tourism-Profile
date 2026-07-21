@@ -17,7 +17,7 @@ export default function DashboardDataWrapper() {
       }
 
       try {
-        const response = await fetch(`/api/get-lgu-data/${userId}`);
+        const response = await fetch(`http://localhost:3000/api/get-lgu-data/${userId}`);
         
         if (response.ok) {
           const dbData = await response.json();
@@ -30,7 +30,7 @@ export default function DashboardDataWrapper() {
             return [];
           };
 
-          // Merging logic - PRESERVE IMAGE AND MATCH BACKEND SNAKE_CASE
+          // Merging logic - FIXED TO PRESERVE IMAGE
           setProfileData({
             ...initialProfileData,
             // 1. Basic Info
@@ -40,29 +40,30 @@ export default function DashboardDataWrapper() {
               province: dbData.basicInfo?.province || initialProfileData.basicInfo.province,
               region: dbData.basicInfo?.region || initialProfileData.basicInfo.region,
               population: dbData.basicInfo?.population || "",
-              landArea: dbData.basicInfo?.land_area || dbData.basicInfo?.landArea || "", 
+              landArea: dbData.basicInfo?.land_area || "", 
               barangays: dbData.basicInfo?.barangays || "",
-              religions: dbData.basicInfo?.religion || dbData.basicInfo?.religions || "", 
+              religions: dbData.basicInfo?.religion || "", 
               languages: dbData.basicInfo?.languages || "",
-              economicActivities: dbData.basicInfo?.economic_activities || dbData.basicInfo?.economicActivities || "" 
+              economicActivities: dbData.basicInfo?.economic_activities || "" 
             },
             // 2. Officials
             officials: {
               ...initialProfileData.officials,
               mayor: dbData.officials?.mayor || "",
-              viceMayor: dbData.officials?.vice_mayor || dbData.officials?.viceMayor || "", 
-              tourismOfficer: dbData.officials?.tourism_officer || dbData.officials?.tourismOfficer || "", 
-              planningCoordinator: dbData.officials?.planning_coordinator || dbData.officials?.planningCoordinator || "",
+              viceMayor: dbData.officials?.vice_mayor || "", 
+              tourismOfficer: dbData.officials?.tourism_officer || "", 
+              planningCoordinator: dbData.officials?.planning_coordinator || "",
               council: safeArray(dbData.officials?.council).length > 0 
                 ? safeArray(dbData.officials.council) 
                 : initialProfileData.officials.council,
             },
-            // 3. Tourism Assets
+            // 3. Tourism Assets - CRITICAL FIX HERE
             tourismAssets: {
               ...initialProfileData.tourismAssets,
               attractions: safeArray(dbData.tourismAssets?.attractions),
               accommodations: safeArray(dbData.tourismAssets?.accommodations),
-              facilities: safeArray(dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile),
+              facilities: safeArray(dbData.tourismAssets?.facilities),
+              // We check every possible key the backend might send
               tourismMap: dbData.tourismAssets?.tourismMap || 
                           dbData.tourismAssets?.tourism_map || 
                           dbData.tourismMap || 
@@ -76,30 +77,12 @@ export default function DashboardDataWrapper() {
                 : (Array.isArray(dbData.transportation) ? dbData.transportation : [])
             },
             // 5. Institutional Data
-            institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
-              ? {
-                  ...dbData.institutional,
-                  labor_force: dbData.institutional.labor_force || dbData.institutional.laborForce || {},
-                  laborForce: dbData.institutional.laborForce || dbData.institutional.labor_force || {},
-                  revenue_data: dbData.institutional.revenue_data || dbData.institutional.revenueData || {},
-                  revenueData: dbData.institutional.revenueData || dbData.institutional.revenue_data || {},
-                  emergency_contacts: dbData.institutional.emergency_contacts || dbData.institutional.emergencyContacts || [],
-                  emergencyContacts: dbData.institutional.emergencyContacts || dbData.institutional.emergency_contacts || [],
-                  tourism_education: dbData.institutional.tourism_education || dbData.institutional.tourismEducation || [],
-                  tourismEducation: dbData.institutional.tourismEducation || dbData.institutional.tourism_education || [],
-                  tourism_projects: dbData.institutional.tourism_projects || dbData.institutional.tourismProjects || [],
-                  tourismProjects: dbData.institutional.tourismProjects || dbData.institutional.tourism_projects || []
-                }
-              : initialProfileData.institutional,
-            // 6. Safety Data
-            crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || {},
-            hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || {}
+            ...dbData.institutional 
           });
         }
       } catch (err) {
         console.error("Fetch error:", err);
       } finally {
-        // ✅ FIXED: Changed from 'private finally' to standard 'finally' block
         setLoading(false);
       }
     };

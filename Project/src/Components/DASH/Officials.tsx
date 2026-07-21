@@ -18,8 +18,7 @@ export default function Officials({ data }: { data: any }) {
         {/* VICE MAYOR */}
         <div className="p-4 flex gap-2 hover:bg-white/20 transition-all duration-300">
           <span className="text-gray-600 text-[10px] w-24 tracking-widest opacity-70">Vice Mayor:</span>
-          {/* ✅ FIXED: Fallback to vice_mayor to match PostgreSQL table formats seamlessly */}
-          <span className="drop-shadow-sm">{data?.viceMayor || data?.vice_mayor || "-"}</span>
+          <span className="drop-shadow-sm">{data?.viceMayor || "-"}</span>
         </div>
         
         {/* SECTION DIVIDER */}
@@ -45,15 +44,13 @@ export default function Officials({ data }: { data: any }) {
         {/* TOURISM OFFICER */}
         <div className="p-4 flex gap-2 hover:bg-white/20 transition-all duration-300">
           <span className="text-gray-600 text-[10px] w-32 tracking-widest opacity-70">Tourism Officer:</span>
-          {/* ✅ FIXED: Fallback to tourism_officer schema fields */}
-          <span className="drop-shadow-sm">{data?.tourismOfficer || data?.tourism_officer || "-"}</span>
+          <span className="drop-shadow-sm">{data?.tourismOfficer || "-"}</span>
         </div>
 
         {/* PLANNING COORDINATOR */}
         <div className="p-4 flex gap-2 hover:bg-white/20 transition-all duration-300">
           <span className="text-gray-600 text-[10px] w-70 tracking-widest opacity-70">Planning and Development Coordinator:</span>
-          {/* ✅ FIXED: Fallback to planning_coordinator column format explicitly */}
-          <span className="drop-shadow-sm">{data?.planningCoordinator || data?.planning_coordinator || "-"}</span>
+          <span className="drop-shadow-sm">{data?.planningCoordinator || "-"}</span>
         </div>
       </div>
     </section>

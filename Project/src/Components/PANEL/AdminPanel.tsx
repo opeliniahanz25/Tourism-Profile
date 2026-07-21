@@ -42,44 +42,51 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
               name: dbData.basicInfo?.name || "",
               province: dbData.basicInfo?.province || "",
               region: dbData.basicInfo?.region || "",
-              landArea: dbData.basicInfo?.land_area || "", 
+              landArea: dbData.basicInfo?.landArea || dbData.basicInfo?.land_area || "", 
               barangays: dbData.basicInfo?.barangays || "",
-              population: dbData.basicInfo?.population || "", // ✅ Unified key binding
+              population: dbData.basicInfo?.population || "",
               languages: dbData.basicInfo?.languages || "",
-              religions: dbData.basicInfo?.religion || dbData.basicInfo?.religions || "", // ✅ Graceful fallback
-              economicActivities: dbData.basicInfo?.economic_activities || "" 
+              religions: dbData.basicInfo?.religions || dbData.basicInfo?.religion || "", 
+              economicActivities: dbData.basicInfo?.economicActivities || dbData.basicInfo?.economic_activities || "" 
             },
             officials: {
               ...prev.officials,
               mayor: dbData.officials?.mayor || "",
-              viceMayor: dbData.officials?.vice_mayor || "", 
-              tourismOfficer: dbData.officials?.tourism_officer || "", 
-              planningCoordinator: dbData.officials?.planning_coordinator || "",
-              skFederationPresident: dbData.officials?.sk_federation_president || "",
+              viceMayor: dbData.officials?.viceMayor || dbData.officials?.vice_mayor || "", 
+              tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
+              planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
+              skFederationPresident: dbData.officials?.skFederationPresident || dbData.officials?.sk_federation_president || "",
               council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : Array(10).fill(""),
-              skMembers: Array.isArray(dbData.officials?.sk_members) ? dbData.officials.sk_members : []
+              skMembers: Array.isArray(dbData.officials?.skMembers) 
+                ? dbData.officials.skMembers 
+                : Array.isArray(dbData.officials?.sk_members) 
+                ? dbData.officials.sk_members 
+                : []
             },
             tourismAssets: {
               ...prev.tourismAssets,
               attractions: dbData.tourismAssets?.attractions || [],
               accommodations: dbData.tourismAssets?.accommodations || [],
-              facilities: dbData.tourismAssets?.facilities || [],
+              facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
               tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
             },
             transportation: {
               ...prev.transportation,
-              list: Array.isArray(dbData.transportation?.list) ? dbData.transportation.list : []
+              list: Array.isArray(dbData.transportation?.list) 
+                ? dbData.transportation.list 
+                : Array.isArray(dbData.transportation) 
+                ? dbData.transportation 
+                : []
             },
-            // ✅ Read direct structural elements from database tables cleanly
-            institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
-                ? {
-                    ...dbData.institutional,
-                    labor_force: dbData.institutional.labor_force || dbData.institutional.laborForce || {},
-                    revenue_data: dbData.institutional.revenue_data || dbData.institutional.revenueData || {}
-                  } 
-                : prev.institutional,
-            crimeIncidents: dbData.crimeIncidents || prev.crimeIncidents || {},
-            hazardMatrix: dbData.hazardMatrix || prev.hazardMatrix || {}
+            institutional: {
+              laborForce: dbData.institutional?.laborForce || dbData.institutional?.labor_force || prev.institutional?.laborForce || {},
+              revenueData: dbData.institutional?.revenueData || dbData.institutional?.revenue_data || prev.institutional?.revenueData || {},
+              emergencyContacts: dbData.institutional?.emergencyContacts || dbData.institutional?.emergency_contacts || prev.institutional?.emergencyContacts || [],
+              tourismEducation: dbData.institutional?.tourismEducation || dbData.institutional?.tourism_education || prev.institutional?.tourismEducation || [],
+              tourismProjects: dbData.institutional?.tourismProjects || dbData.institutional?.tourism_projects || prev.institutional?.tourismProjects || []
+            },
+            crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || dbData.institutional?.crime_incidents || prev.crimeIncidents || {},
+            hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || dbData.institutional?.hazard_matrix || prev.hazardMatrix || {}
           }));
         }
       } catch (error) {
@@ -105,15 +112,15 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId, 
-          name: data.basicInfo.name,
-          province: data.basicInfo.province,
-          region: data.basicInfo.region,
-          land_area: data.basicInfo.landArea,
-          barangays: data.basicInfo.barangays,
-          population: data.basicInfo.population, // ✅ Passes matching fixed key
-          languages: data.basicInfo.languages,
-          religion: data.basicInfo.religions || data.basicInfo.religion, // ✅ Fixed mapping mismatch
-          economic_activities: data.basicInfo.economicActivities 
+          name: data.basicInfo?.name || "",
+          province: data.basicInfo?.province || "",
+          region: data.basicInfo?.region || "",
+          land_area: data.basicInfo?.landArea || "",
+          barangays: data.basicInfo?.barangays || "",
+          population: data.basicInfo?.population || "",
+          languages: data.basicInfo?.languages || "",
+          religion: data.basicInfo?.religions || "",
+          economic_activities: data.basicInfo?.economicActivities || "" 
         }),
       }),
       fetch(`/api/save-officials`, {
@@ -121,13 +128,13 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId,
-          mayor: data.officials.mayor || "",
-          vice_mayor: data.officials.viceMayor || "", 
-          tourism_officer: data.officials.tourismOfficer || "",
-          planning_coordinator: data.officials.planningCoordinator || "",
-          sk_federation_president: data.officials.skFederationPresident || "",
-          council: data.officials.council,
-          sk_members: data.officials.skMembers
+          mayor: data.officials?.mayor || "",
+          vice_mayor: data.officials?.viceMayor || "", 
+          tourism_officer: data.officials?.tourismOfficer || "",
+          planning_coordinator: data.officials?.planningCoordinator || "",
+          sk_federation_president: data.officials?.skFederationPresident || "",
+          council: data.officials?.council || [],
+          sk_members: data.officials?.skMembers || []
         }),
       }),
       fetch(`/api/save-tourism-assets`, {
@@ -135,8 +142,9 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId, 
-          attractions: data.tourismAssets.attractions, 
-          tourismMap: data.tourismAssets.tourismMap 
+          attractions: data.tourismAssets?.attractions || [], 
+          tourismMap: data.tourismAssets?.tourismMap || "",
+          tourism_map: data.tourismAssets?.tourismMap || "" 
         }),
       }),
       fetch(`/api/save-accommodations`, {
@@ -144,8 +152,8 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId, 
-          accommodations: data.tourismAssets.accommodations, 
-          accommodation_profile: data.tourismAssets.facilities 
+          accommodations: data.tourismAssets?.accommodations || [], 
+          accommodation_profile: data.tourismAssets?.facilities || [] 
         }),
       }),
       fetch(`/api/save-transport`, {
@@ -153,7 +161,7 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId, 
-          list: data.transportation.list 
+          list: data.transportation?.list || [] 
         }),
       }),
       fetch(`/api/save-institutional`, {
@@ -161,11 +169,16 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          data: {
-            ...data.institutional,
-            labor_force: data.institutional?.labor_force || data.institutional?.laborForce, // ✅ Snake case alignment
-            revenue_data: data.institutional?.revenue_data || data.institutional?.revenueData // ✅ Snake case alignment
-          }
+          labor_force: data.institutional?.laborForce || {},
+          laborForce: data.institutional?.laborForce || {},
+          revenue_data: data.institutional?.revenueData || {},
+          revenueData: data.institutional?.revenueData || {},
+          emergency_contacts: data.institutional?.emergencyContacts || [],
+          emergencyContacts: data.institutional?.emergencyContacts || [],
+          tourism_education: data.institutional?.tourismEducation || [],
+          tourismEducation: data.institutional?.tourismEducation || [],
+          tourism_projects: data.institutional?.tourismProjects || [],
+          tourismProjects: data.institutional?.tourismProjects || []
         }),
       }),
       fetch(`/api/save-safety`, {
@@ -173,8 +186,10 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          crimeIncidents: data.crimeIncidents,
-          hazardMatrix: data.hazardMatrix
+          crimeIncidents: data.crimeIncidents || {},
+          crime_incidents: data.crimeIncidents || {},
+          hazardMatrix: data.hazardMatrix || {},
+          hazard_matrix: data.hazardMatrix || {}
         }),
       })
     ];

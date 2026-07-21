@@ -17,11 +17,6 @@ export default function TabOfficials({ editData, setEditData }: { editData: Prof
       updatedOfficials.council = currentList;
     } else {
       (updatedOfficials as any)[field] = value;
-      
-      // ✅ FIXED: Support snake_case schema naming alongside camelCase for production database safety
-      if (field === 'viceMayor') (updatedOfficials as any)['vice_mayor'] = value;
-      if (field === 'tourismOfficer') (updatedOfficials as any)['tourism_officer'] = value;
-      if (field === 'planningCoordinator') (updatedOfficials as any)['planning_coordinator'] = value;
     }
 
     setEditData({ 
@@ -50,10 +45,9 @@ export default function TabOfficials({ editData, setEditData }: { editData: Prof
               <label className="text-[10px] font-black text-gray-400 uppercase">
                 {item.label}
               </label>
-              {/* ✅ FIXED: Value reads gracefully from both frontend and backend properties to handle strict db formats */}
               <input 
                 className="w-full bg-[#f3f4f6] rounded-lg px-4 py-2 font-black text-gray-700 outline-none uppercase border border-transparent focus:border-blue-500 transition-all" 
-                value={(editData.officials as any)[item.id] || (editData.officials as any)[item.id === 'viceMayor' ? 'vice_mayor' : item.id === 'tourismOfficer' ? 'tourism_officer' : item.id === 'planningCoordinator' ? 'planning_coordinator' : ''] || ""} 
+                value={(editData.officials as any)[item.id] || ""} 
                 onChange={(e) => updateOfficial(item.id, e.target.value.toUpperCase())} 
               />
             </div>
