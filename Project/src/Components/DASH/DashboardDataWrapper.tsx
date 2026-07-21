@@ -23,72 +23,55 @@ export default function DashboardDataWrapper() {
 
       if (response.ok) {
         const dbData = await response.json();
+        console.log("📥 Raw API Response on Dashboard:", dbData);
 
-        setProfileData((prev: any) => ({
-          ...prev,
+        // Directly construct the profile object without erasing existing values
+        const b = dbData.basicInfo || {};
+        const o = dbData.officials || {};
+        const t = dbData.tourismAssets || {};
+        const tr = dbData.transportation || {};
+        const inst = dbData.institutional || {};
 
-          // 1. Basic Info
+        setProfileData({
           basicInfo: {
-            ...prev.basicInfo,
-            name: dbData.basicInfo?.name || "",
-            province: dbData.basicInfo?.province || "",
-            region: dbData.basicInfo?.region || "",
-            landArea: dbData.basicInfo?.landArea || dbData.basicInfo?.land_area || "", 
-            barangays: dbData.basicInfo?.barangays || "",
-            population: dbData.basicInfo?.population || "",
-            languages: dbData.basicInfo?.languages || "",
-            religions: dbData.basicInfo?.religions || dbData.basicInfo?.religion || "", 
-            economicActivities: dbData.basicInfo?.economicActivities || dbData.basicInfo?.economic_activities || "" 
+            name: b.name || initialProfileData.basicInfo.name,
+            province: b.province || initialProfileData.basicInfo.province,
+            region: b.region || initialProfileData.basicInfo.region,
+            population: b.population || "",
+            // Check BOTH camelCase and SQL snake_case keys:
+            landArea: b.landArea || b.land_area || "",
+            barangays: b.barangays || "",
+            religions: b.religions || b.religion || "",
+            languages: b.languages || "",
+            economicActivities: b.economicActivities || b.economic_activities || ""
           },
-
-          // 2. Officials
           officials: {
-            ...prev.officials,
-            mayor: dbData.officials?.mayor || "",
-            viceMayor: dbData.officials?.viceMayor || dbData.officials?.vice_mayor || "", 
-            tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
-            planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
-            skFederationPresident: dbData.officials?.skFederationPresident || dbData.officials?.sk_federation_president || "",
-            council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : Array(10).fill(""),
-            skMembers: Array.isArray(dbData.officials?.skMembers) 
-              ? dbData.officials.skMembers 
-              : Array.isArray(dbData.officials?.sk_members) 
-              ? dbData.officials.sk_members 
-              : []
+            mayor: o.mayor || "",
+            viceMayor: o.viceMayor || o.vice_mayor || "",
+            tourismOfficer: o.tourismOfficer || o.tourism_officer || "",
+            planningCoordinator: o.planningCoordinator || o.planning_coordinator || "",
+            skFederationPresident: o.skFederationPresident || o.sk_federation_president || "",
+            council: Array.isArray(o.council) ? o.council : initialProfileData.officials.council,
+            skMembers: Array.isArray(o.skMembers) ? o.skMembers : (Array.isArray(o.sk_members) ? o.sk_members : [])
           },
-
-          // 3. Tourism Assets
           tourismAssets: {
-            ...prev.tourismAssets,
-            attractions: dbData.tourismAssets?.attractions || [],
-            accommodations: dbData.tourismAssets?.accommodations || [],
-            facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
-            tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
+            attractions: Array.isArray(t.attractions) ? t.attractions : [],
+            accommodations: Array.isArray(t.accommodations) ? t.accommodations : [],
+            facilities: Array.isArray(t.facilities) ? t.facilities : (Array.isArray(t.accommodation_profile) ? t.accommodation_profile : []),
+            tourismMap: t.tourismMap || t.tourism_map || ""
           },
-
-          // 4. Transportation
           transportation: {
-            ...prev.transportation,
-            list: Array.isArray(dbData.transportation?.list) 
-              ? dbData.transportation.list 
-              : Array.isArray(dbData.transportation) 
-              ? dbData.transportation 
-              : []
+            list: Array.isArray(tr.list) ? tr.list : (Array.isArray(tr) ? tr : [])
           },
-
-          // 5. Institutional
           institutional: {
-            laborForce: dbData.institutional?.laborForce || dbData.institutional?.labor_force || prev.institutional?.laborForce || {},
-            revenueData: dbData.institutional?.revenueData || dbData.institutional?.revenue_data || prev.institutional?.revenueData || {},
-            emergencyContacts: dbData.institutional?.emergencyContacts || dbData.institutional?.emergency_contacts || prev.institutional?.emergencyContacts || [],
-            tourismEducation: dbData.institutional?.tourismEducation || dbData.institutional?.tourism_education || prev.institutional?.tourismEducation || [],
-            tourismProjects: dbData.institutional?.tourismProjects || dbData.institutional?.tourism_projects || prev.institutional?.tourismProjects || []
+            institutionalFacilities: inst.institutionalFacilities || inst.facilities || [],
+            laborForce: inst.laborForce || inst.labor_force || {},
+            revenueData: inst.revenueData || inst.revenue_data || {},
+            revenueYears: inst.revenueYears || ['y1', 'y2', 'y3']
           },
-
-          // 6. Safety & Hazard Matrix
-          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || dbData.institutional?.crime_incidents || prev.crimeIncidents || {},
-          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || dbData.institutional?.hazard_matrix || prev.hazardMatrix || {}
-        }));
+          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || inst.crimeIncidents || inst.crime_incidents || {},
+          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || inst.hazardMatrix || inst.hazard_matrix || {}
+        });
       }
     } catch (error) {
       console.error("❌ Dashboard Fetch Error:", error);
