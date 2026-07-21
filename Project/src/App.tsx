@@ -14,69 +14,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default function App() {
-  // State for global management (Fallback/Legacy support)
-  const [tourismData, setTourismData] = React.useState({
-    basicInfo: { 
-      name: "PANGLAO", 
-      province: "BOHOL", 
-      region: "VII",
-      landArea: "",
-      barangays: "",
-      population: "",
-      languages: "",
-      religions: "",
-      economicActivities: ""
-    },
-    officials: { 
-      mayor: "", 
-      viceMayor: "", 
-      council: ["", "", "", "", "", "", "", ""], 
-      tourismOfficer: "", 
-      planningCoordinator: "",
-      skFederationPresident: "",
-      skMembers: []
-    },
-    tourismAssets: { 
-      attractions: [], 
-      accommodations: [], 
-      profiles: [], 
-      facilities: [],
-      tourismMap: ""
-    },
-    transportation: {
-      list: []
-    }, 
-    // Institutional / Safety Structures
-    institutionalFacilities: [],
-    laborForce: {},
-    revenueData: {},
-    emergencyContacts: [],
-    tourismEducation: [],
-    tourismProjects: [],
-    crimeIncidents: {},
-    hazardMatrix: {}
-  });
-
   // --- THE BRIDGE ---
-  // This notifies components if they are still listening to LocalStorage
+  // Triggers custom event to notify DashboardDataWrapper to re-fetch from PostgreSQL
   const handleSave = () => {
-    localStorage.setItem('tourism_data', JSON.stringify(tourismData));
-    // Trigger global event for components like AdminDashboard to re-sync
-    window.dispatchEvent(new Event("storage"));
-    console.log("STATE SYNCED TO LOCALSTORAGE");
+    window.dispatchEvent(new Event("db_data_updated"));
+    console.log("✅ TRIGGERED RE-FETCH FROM POSTGRESQL");
   };
-
-  // Initial Load from LocalStorage (Optional: useAdminData hook handles DB load)
-  React.useEffect(() => {
-    const saved = localStorage.getItem('tourism_data');
-    if (saved) {
-      try {
-        setTourismData(JSON.parse(saved));
-      } catch (e) {
-        console.error("Data Corrupted", e);
-      }
-    }
-  }, []);
 
   return (
     <BrowserRouter>
@@ -101,9 +44,6 @@ export default function App() {
           path="/admin-panel" 
           element={
             <ProtectedRoute>
-              {/* AdminPanel now uses useAdminData() internally 
-                  to handle DB logic for each tab.
-              */}
               <AdminPanel onSave={handleSave} />
             </ProtectedRoute>
           } 

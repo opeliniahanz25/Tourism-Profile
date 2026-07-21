@@ -98,13 +98,20 @@ export default function DashboardDataWrapper() {
     }
   }, []);
 
-  // Re-fetch whenever location (path) changes or tab gains focus
+  // Re-fetch whenever location (path) changes, tab gains focus, or db_data_updated event fires
   useEffect(() => {
     loadFromDatabase();
 
     const handleFocus = () => loadFromDatabase();
+    const handleDbUpdate = () => loadFromDatabase();
+
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener('db_data_updated', handleDbUpdate);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('db_data_updated', handleDbUpdate);
+    };
   }, [location.pathname, loadFromDatabase]);
 
   if (loading) {
