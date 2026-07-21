@@ -8,22 +8,35 @@ export default function DashboardDataWrapper() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
-  // --- EXACT FETCH METHOD FROM ADMIN PANEL ---
   const loadFromDatabase = useCallback(async () => {
     setLoading(true);
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-    const userId = storedUser.id;
+    const userId = storedUser?.id;
+
+    console.log("🔍 Checking localStorage user ID:", userId);
+
     if (!userId) {
+      console.warn("⚠️ No User ID found in localStorage! Please Log out and Log back in.");
       setLoading(false);
       return;
     }
 
     try {
       const response = await fetch(`/api/get-lgu-data/${userId}`);
+      console.log("📡 Fetching LGU data response status:", response.status);
+
       if (response.ok) {
         const dbData = await response.json();
-        
-        // Exact state mapping logic mirrored from AdminPanel
+        console.log("📥 Raw PostgreSQL Data Received:", dbData);
+
+        const parseArray = (w: any) => {
+          if (Array.isArray(w)) return w;
+          if (typeof w === "string" && w.trim() !== "") {
+            try { return JSON.parse(w); } catch { return []; }
+          }
+          return [];
+        };
+
         setProfileData((prev: any) => ({
           ...prev,
           basicInfo: {
@@ -45,18 +58,14 @@ export default function DashboardDataWrapper() {
             tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
             planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
             skFederationPresident: dbData.officials?.skFederationPresident || dbData.officials?.sk_federation_president || "",
-            council: Array.isArray(dbData.officials?.council) ? dbData.officials.council : Array(10).fill(""),
-            skMembers: Array.isArray(dbData.officials?.skMembers) 
-              ? dbData.officials.skMembers 
-              : Array.isArray(dbData.officials?.sk_members) 
-              ? dbData.officials.sk_members 
-              : []
+            council: parseArray(dbData.officials?.council).length > 0 ? parseArray(dbData.officials?.council) : Array(10).fill(""),
+            skMembers: parseArray(dbData.officials?.sk_members || dbData.officials?.skMembers)
           },
           tourismAssets: {
             ...prev.tourismAssets,
-            attractions: dbData.tourismAssets?.attractions || [],
-            accommodations: dbData.tourismAssets?.accommodations || [],
-            facilities: dbData.tourismAssets?.facilities || dbData.tourismAssets?.accommodation_profile || [],
+            attractions: parseArray(dbData.tourismAssets?.attractions),
+            accommodations: parseArray(dbData.tourismAssets?.accommodations),
+            facilities: parseArray(dbData.tourismAssets?.facilities),
             tourismMap: dbData.tourismAssets?.tourismMap || dbData.tourismAssets?.tourism_map || ""
           },
           transportation: {
@@ -67,26 +76,22 @@ export default function DashboardDataWrapper() {
               ? dbData.transportation 
               : []
           },
-          institutional: {
-            laborForce: dbData.institutional?.laborForce || dbData.institutional?.labor_force || prev.institutional?.laborForce || {},
-            revenueData: dbData.institutional?.revenueData || dbData.institutional?.revenue_data || prev.institutional?.revenueData || {},
-            emergencyContacts: dbData.institutional?.emergencyContacts || dbData.institutional?.emergency_contacts || prev.institutional?.emergencyContacts || [],
-            tourismEducation: dbData.institutional?.tourismEducation || dbData.institutional?.tourism_education || prev.institutional?.tourismEducation || [],
-            tourismProjects: dbData.institutional?.tourismProjects || dbData.institutional?.tourism_projects || prev.institutional?.tourismProjects || [],
-            institutionalFacilities: dbData.institutional?.institutionalFacilities || dbData.institutional?.facilities || prev.institutional?.institutionalFacilities || []
-          },
-          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || dbData.institutional?.crimeIncidents || dbData.institutional?.crime_incidents || prev.crimeIncidents || {},
-          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || dbData.institutional?.hazardMatrix || dbData.institutional?.hazard_matrix || prev.hazardMatrix || {}
+          institutional: dbData.institutional && Object.keys(dbData.institutional).length > 0 
+            ? dbData.institutional 
+            : prev.institutional,
+          crimeIncidents: dbData.crimeIncidents || dbData.crime_incidents || prev.crimeIncidents || {},
+          hazardMatrix: dbData.hazardMatrix || dbData.hazard_matrix || prev.hazardMatrix || {}
         }));
+      } else {
+        console.error("❌ API returned error status:", response.status);
       }
     } catch (error) {
-      console.error("Fetch Error:", error);
+      console.error("❌ Fetch Error in DashboardDataWrapper:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Sync on mount, page route change, tab focus, or custom save event
   useEffect(() => {
     loadFromDatabase();
 
