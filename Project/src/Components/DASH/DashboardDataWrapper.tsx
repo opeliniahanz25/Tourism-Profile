@@ -19,13 +19,12 @@ export default function DashboardDataWrapper() {
     }
 
     try {
+      // 🚨 CRITICAL FIX: Relative URL (/api/...) instead of http://localhost:3000/api/...
       const response = await fetch(`/api/get-lgu-data/${userId}`);
 
       if (response.ok) {
         const dbData = await response.json();
-        console.log("📥 Raw API Response on Dashboard:", dbData);
 
-        // Directly construct the profile object without erasing existing values
         const b = dbData.basicInfo || {};
         const o = dbData.officials || {};
         const t = dbData.tourismAssets || {};
@@ -38,7 +37,6 @@ export default function DashboardDataWrapper() {
             province: b.province || initialProfileData.basicInfo.province,
             region: b.region || initialProfileData.basicInfo.region,
             population: b.population || "",
-            // Check BOTH camelCase and SQL snake_case keys:
             landArea: b.landArea || b.land_area || "",
             barangays: b.barangays || "",
             religions: b.religions || b.religion || "",
