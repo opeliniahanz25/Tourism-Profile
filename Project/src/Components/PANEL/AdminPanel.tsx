@@ -26,6 +26,7 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = storedUser.id;
       if (!userId) {
+        console.warn("⚠️ No user ID found in localStorage!");
         setLoading(false);
         return;
       }
@@ -34,6 +35,7 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         const response = await fetch(`/api/get-lgu-data/${userId}`);
         if (response.ok) {
           const dbData = await response.json();
+          console.log("📥 AdminPanel Fetched Data:", dbData);
           
           setEditData((prev: any) => ({
             ...prev,
@@ -90,7 +92,7 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
           }));
         }
       } catch (error) {
-        console.error("Fetch Error:", error);
+        console.error("❌ AdminPanel Fetch Error:", error);
       } finally {
         setLoading(false);
       }
@@ -100,9 +102,11 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
 
   // --- 2. SAVE ALL DATA TO DATABASE ---
   const handleSave = async () => {
-    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
-    if (!userId) return toast.error("LOGIN REQUIRED");
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const userId = storedUser.id;
+    if (!userId) return toast.error("LOGIN REQUIRED - NO USER ID");
 
+    console.log("💾 Starting save process for User ID:", userId);
     const toastId = toast.loading("SAVING ALL CHANGES...");
     const data = editData as any;
 
@@ -169,16 +173,7 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          labor_force: data.institutional?.laborForce || {},
-          laborForce: data.institutional?.laborForce || {},
-          revenue_data: data.institutional?.revenueData || {},
-          revenueData: data.institutional?.revenueData || {},
-          emergency_contacts: data.institutional?.emergencyContacts || [],
-          emergencyContacts: data.institutional?.emergencyContacts || [],
-          tourism_education: data.institutional?.tourismEducation || [],
-          tourismEducation: data.institutional?.tourismEducation || [],
-          tourism_projects: data.institutional?.tourismProjects || [],
-          tourismProjects: data.institutional?.tourismProjects || []
+          data: data.institutional || {}
         }),
       }),
       fetch(`/api/save-safety`, {
@@ -200,12 +195,18 @@ export default function AdminPanel({ onSave: propOnSave }: any) {
 
       if (allSuccessful) {
         toast.success("ALL DATA SAVED SUCCESSFULLY!", { id: toastId });
+        console.log("✅ All save operations succeeded!");
+        
+        // Notify any active components to re-fetch from PostgreSQL
+        window.dispatchEvent(new Event("db_data_updated"));
+        
         if (propOnSave) propOnSave();
       } else {
+        console.error("❌ Some save operations failed:", results);
         toast.error("SOME SECTIONS FAILED TO SAVE. PLEASE TRY AGAIN.", { id: toastId });
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ Save Network/Server Error:", err);
       toast.error("DATABASE CONNECTION FAILED!", { id: toastId });
     }
   };
