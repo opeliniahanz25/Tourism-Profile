@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { LGUController } from './controllers.js';
-import pool from './db.js';
+import db from './db.js'; // Updated import to match export default in db.js
 
 const app = express();
 
@@ -39,7 +39,7 @@ app.get(/.*/, (req, res) => {
 });
 
 // Test the database connection engine layer on startup
-pool.connect((err, client, release) => {
+db.connect((err, client, release) => {
   if (err) {
     console.error("❌ DATABASE CONNECTION FAILED:", err.message);
   } else {
