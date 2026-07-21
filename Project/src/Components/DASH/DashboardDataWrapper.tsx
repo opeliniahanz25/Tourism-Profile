@@ -9,7 +9,7 @@ export default function DashboardDataWrapper() {
   useEffect(() => {
     const loadData = async () => {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = storedUser.id;
+      const userId = storedUser?.id;
       
       if (!userId) { 
         setLoading(false); 
@@ -17,7 +17,6 @@ export default function DashboardDataWrapper() {
       }
 
       try {
-        // Changed from hardcoded http://localhost:3000 to relative route for production compatibility
         const response = await fetch(`/api/get-lgu-data/${userId}`);
         
         if (response.ok) {
@@ -31,45 +30,58 @@ export default function DashboardDataWrapper() {
             return [];
           };
 
-          // Merging logic - FIXED TO PRESERVE IMAGE
+          const safeObject = (val: any) => {
+            if (val && typeof val === 'object' && !Array.isArray(val)) return val;
+            if (typeof val === 'string' && val.trim() !== "") {
+              try { return JSON.parse(val); } catch { return {}; }
+            }
+            return {};
+          };
+
+          // Extract institutional payload cleanly
+          const instPayload = dbData.institutional?.data || dbData.institutional || {};
+
           setProfileData({
             ...initialProfileData,
+
             // 1. Basic Info
             basicInfo: {
               ...initialProfileData.basicInfo,
-              name: dbData.basicInfo?.name || initialProfileData.basicInfo.name,
-              province: dbData.basicInfo?.province || initialProfileData.basicInfo.province,
-              region: dbData.basicInfo?.region || initialProfileData.basicInfo.region,
+              name: dbData.basicInfo?.name || initialProfileData.basicInfo.name || "",
+              province: dbData.basicInfo?.province || initialProfileData.basicInfo.province || "",
+              region: dbData.basicInfo?.region || initialProfileData.basicInfo.region || "",
               population: dbData.basicInfo?.population || "",
-              landArea: dbData.basicInfo?.land_area || "", 
+              landArea: dbData.basicInfo?.landArea || dbData.basicInfo?.land_area || "", 
               barangays: dbData.basicInfo?.barangays || "",
-              religions: dbData.basicInfo?.religion || "", 
+              religions: dbData.basicInfo?.religions || dbData.basicInfo?.religion || "", 
               languages: dbData.basicInfo?.languages || "",
-              economicActivities: dbData.basicInfo?.economic_activities || "" 
+              economicActivities: dbData.basicInfo?.economicActivities || dbData.basicInfo?.economic_activities || "" 
             },
+
             // 2. Officials
             officials: {
               ...initialProfileData.officials,
               mayor: dbData.officials?.mayor || "",
-              viceMayor: dbData.officials?.vice_mayor || "", 
-              tourismOfficer: dbData.officials?.tourism_officer || "", 
-              planningCoordinator: dbData.officials?.planning_coordinator || "",
+              viceMayor: dbData.officials?.viceMayor || dbData.officials?.vice_mayor || "", 
+              tourismOfficer: dbData.officials?.tourismOfficer || dbData.officials?.tourism_officer || "", 
+              planningCoordinator: dbData.officials?.planningCoordinator || dbData.officials?.planning_coordinator || "",
               council: safeArray(dbData.officials?.council).length > 0 
                 ? safeArray(dbData.officials.council) 
                 : initialProfileData.officials.council,
             },
-            // 3. Tourism Assets - CRITICAL FIX HERE
+
+            // 3. Tourism Assets
             tourismAssets: {
               ...initialProfileData.tourismAssets,
               attractions: safeArray(dbData.tourismAssets?.attractions),
               accommodations: safeArray(dbData.tourismAssets?.accommodations),
               facilities: safeArray(dbData.tourismAssets?.facilities),
-              // We check every possible key the backend might send
               tourismMap: dbData.tourismAssets?.tourismMap || 
                           dbData.tourismAssets?.tourism_map || 
                           dbData.tourismMap || 
                           ""
             },
+
             // 4. Transportation
             transportation: {
               ...initialProfileData.transportation,
@@ -77,16 +89,27 @@ export default function DashboardDataWrapper() {
                 ? dbData.transportation.list 
                 : (Array.isArray(dbData.transportation) ? dbData.transportation : [])
             },
-            // 5. Institutional Data
-            ...dbData.institutional 
-          });
+
+            // 5. Institutional Elements & Safety (Nested inside institutional/top-level according to your schema)
+            ...instPayload,
+            institutionalFacilities: safeArray(instPayload.institutionalFacilities || instPayload.facilities),
+            laborForce: safeObject(instPayload.laborForce),
+            revenueData: safeObject(instPayload.revenueData),
+            revenueYears: safeArray(instPayload.revenueYears).length > 0 ? safeArray(instPayload.revenueYears) : ['y1', 'y2', 'y3'],
+            emergencyContacts: safeArray(instPayload.emergencyContacts),
+            tourismEducation: safeArray(instPayload.tourismEducation),
+            tourismProjects: safeArray(instPayload.tourismProjects),
+            crimeIncidents: safeObject(dbData.institutional?.crimeIncidents || instPayload.crimeIncidents),
+            hazardMatrix: safeObject(dbData.institutional?.hazardMatrix || instPayload.hazardMatrix)
+          } as any); // Cast as any to bypass strict type mismatch with custom institutional fields
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("❌ Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
+
     loadData();
   }, []);
 
