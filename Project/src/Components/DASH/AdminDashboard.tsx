@@ -55,9 +55,9 @@ export default function AdminDashboard({ profileData }: AdminDashboardProps) {
       <DashboardHeader onPrint={handleSaveToPC} />
 
       <main 
-        ref={mainContentRef} 
-        className="max-w-5xl w-full mx-auto p-8 space-y-10 grow my-10 rounded-2xl bg-white/90 shadow-xl"
-      >
+  ref={mainContentRef} 
+  className="max-w-5xl w-full mx-auto p-8 space-y-10 grow my-10 rounded-2xl bg-white/90 shadow-xl"
+>
         <TitleCard />
         <BasicInfo data={profileData?.basicInfo} />
         <Officials data={profileData?.officials} />
